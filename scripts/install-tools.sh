@@ -334,10 +334,30 @@ setup_python_env() {
 # Install Python packages safely
 install_python_packages() {
     local packages=("$@")
+    local expected_venv="$HOME/.venv/redhat-demo"
     
-    # Always check for externally-managed environment before installing packages
+    # Check if we're already in a virtual environment
+    if [[ -n "$VIRTUAL_ENV" ]]; then
+        if [[ "$VIRTUAL_ENV" == "$expected_venv" ]]; then
+            print_info "Already in Red Hat demo virtual environment: $VIRTUAL_ENV"
+            print_info "Installing packages directly in current virtual environment"
+            python3 -m pip install "${packages[@]}"
+            return
+        else
+            print_info "Currently in different virtual environment: $VIRTUAL_ENV"
+            print_info "Switching to Red Hat demo virtual environment"
+            # Deactivate current and activate ours
+            deactivate 2>/dev/null || true
+            setup_python_env
+            python3 -m pip install "${packages[@]}"
+            return
+        fi
+    fi
+    
+    # Check for externally-managed environment or if we need virtual environment
     if python3 -m pip install --help 2>&1 | grep -q "externally-managed-environment" || \
-       python3 -c "import sysconfig; print(sysconfig.get_path('purelib'))" 2>/dev/null | grep -q "/opt/homebrew\|/usr/local"; then
+       python3 -c "import sysconfig; print(sysconfig.get_path('purelib'))" 2>/dev/null | grep -q "/opt/homebrew\|/usr/local" || \
+       ! python3 -m pip install --user --help >/dev/null 2>&1; then
         print_info "Detected externally-managed Python environment - using virtual environment"
         setup_python_env
         

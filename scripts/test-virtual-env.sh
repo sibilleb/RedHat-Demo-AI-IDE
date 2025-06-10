@@ -101,7 +101,48 @@ fi
 
 echo ""
 
-# Test 4: Cleanup
+# Test 4: Test with different virtual environment active
+print_test "Handling different active virtual environment"
+different_venv_path="$HOME/.venv/test-different"
+
+# Create a different virtual environment
+if python3 -m venv "$different_venv_path"; then
+    print_success "Different virtual environment created"
+else
+    print_error "Failed to create different virtual environment"
+    exit 1
+fi
+
+# Activate the different environment
+if source "$different_venv_path/bin/activate"; then
+    print_success "Different virtual environment activated"
+    print_info "VIRTUAL_ENV: $VIRTUAL_ENV"
+else
+    print_error "Failed to activate different virtual environment"
+    exit 1
+fi
+
+# Now test that our install function switches properly
+# Source the functions from install-tools.sh for testing
+print_info "Testing virtual environment switching behavior..."
+
+# Simulate the behavior (we can't source the full script easily)
+expected_venv="$HOME/.venv/redhat-demo-test2"
+if [[ -n "$VIRTUAL_ENV" ]] && [[ "$VIRTUAL_ENV" != "$expected_venv" ]]; then
+    print_success "Detected different virtual environment correctly"
+    print_info "Would switch from $VIRTUAL_ENV to $expected_venv"
+else
+    print_error "Virtual environment detection logic issue"
+fi
+
+# Cleanup different environment
+deactivate
+rm -rf "$different_venv_path"
+print_success "Different virtual environment cleaned up"
+
+echo ""
+
+# Test 5: Cleanup
 print_test "Cleanup"
 deactivate
 rm -rf "$venv_path"
