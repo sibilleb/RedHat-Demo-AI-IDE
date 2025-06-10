@@ -26,187 +26,30 @@ This repository provides an AI-assisted development environment for creating and
 
 ---
 
-## 🚀 Quick Start Guide
+## 🚀 Installation Options
 
----
-
-## 🔄 Step-by-Step Setup Process
-
-### Phase 1: Fork the Repositories (Manual)
-
-**⚠️ Important: You MUST fork first to contribute properly!**
-
-1. **Go to GitHub and fork these repositories:**
-   - Visit https://github.com/sibilleb/RedHat-Demo-AI-IDE
-   - Click "Fork" in the top right
-   - Visit https://github.com/ansible/product-demos  
-   - Click "Fork" in the top right
-
-2. **Note your GitHub username** - you'll need it in the next steps
-
-### Phase 2: Initial Setup (AI-Assisted)
-
-1. **Create your workspace:**
-   ```bash
-   mkdir my-redhat-demo-workspace
-   cd my-redhat-demo-workspace
-   cursor .
-   ```
-
-2. **In Cursor, enable command execution:**
-   - Go to Settings (Cmd/Ctrl + ,)
-   - Search for "terminal" 
-   - Enable "Allow AI to run terminal commands"
-   - ⚠️ **This allows Claude to install tools and run setup commands for you**
-
-3. **Select your AI model:**
-   - Click the model selector in Cursor
-   - Choose **Claude 3.5 Sonnet** (recommended) or your preferred model
-   - This will be used for the automated setup
-
-4. **Paste this setup prompt:**
-   ```
-   I want to set up my Red Hat demo development environment. I have already forked both repositories to my GitHub account.
-
-   My GitHub username is: [REPLACE-WITH-YOUR-USERNAME]
-
-   Please:
-
-   1. Clone my forked repositories:
-      - https://github.com/[YOUR-USERNAME]/RedHat-Demo-AI-IDE  
-      - https://github.com/[YOUR-USERNAME]/product-demos
-
-   2. Set up git remotes for both repositories:
-      - origin: my forks (for pushing changes)
-      - upstream: original repos (for pulling updates)
-
-   3. Create the required symlinks:
-      - Create .cursor -> RedHat-Demo-AI-IDE/.cursor in workspace root
-      - Create .cursor -> ../RedHat-Demo-AI-IDE/.cursor in product-demos directory
-
-   4. Verify the setup:
-      - Check both repositories were cloned
-      - Verify git remotes are configured properly
-      - Confirm both symlinks exist and point to the correct locations
-   ```
-
-### Phase 3: Complete Environment Setup (AI-Assisted)
-
-After Phase 2 completes, paste this prompt:
+### Option 1: One-Click Automated Setup (Recommended)
 
 ```bash
-Now I need to complete the full development environment setup. Please:
+# 1. Create workspace and get setup script
+mkdir my-redhat-demo-workspace && cd my-redhat-demo-workspace
+curl -sSL https://raw.githubusercontent.com/sibilleb/RedHat-Demo-AI-IDE/main/scripts/one-click-setup.sh -o setup.sh
 
-1. Install all required CLI tools for my operating system:
-   - Terraform, Ansible, HashiCorp Vault
-   - AWS CLI, kubectl, Helm, OpenShift CLI (oc)  
-   - Podman, jq, yq, tree, and development tools
-   - Python packages: ansible-lint, molecule, yamllint, jinja2
+# 2. Run automated setup (replace YOUR_GITHUB_USERNAME)
+chmod +x setup.sh
+./setup.sh --username YOUR_GITHUB_USERNAME
 
-2. Configure Cursor IDE integration:
-   - Set up the .cursor configuration symlink
-   - Copy and configure the comprehensive MCP server template (10 servers)
-   - Install recommended Cursor extensions
-
-3. Set up development workflow tools:
-   - Pre-commit hooks for code quality
-   - Validation scripts
-   - Helper scripts for demo development
-
-My operating system is: [macOS/Linux/Windows]
-I have access to: [AWS account yes/no] [Red Hat developer account yes/no]
+# 3. Add API keys and start developing
+./scripts/start-demo-development.sh
 ```
 
-### Phase 4: API Key Configuration (Manual)
+For detailed information about what the one-click setup does, see the [Setup Guide](SETUP_GUIDE.md#🚀-option-1-one-click-automated-setup-recommended).
 
-1. **Open the MCP configuration file:**
-   ```bash
-   # This file was created in Phase 3
-   cursor .cursor/mcp.json
-   ```
+### Option 2: Manual Setup
 
-2. **Configure your API keys and credentials:**
-   - GitHub Personal Access Token (Required)
-   - AWS Access Key and Secret (Required for AWS services)
-   - Ansible Tower credentials (Optional)
-   - Terraform Cloud token (Optional)
-   - Kubernetes configuration (Optional)
+If you prefer to understand each step or need more control over the setup process, follow our [Manual Setup Guide](SETUP_GUIDE.md#📖-option-2-manual-setup-educational).
 
-3. **Test your setup:**
-   ```bash
-   ./scripts/validate-environment.sh
-   ```
-
-### Phase 5: Start Developing (AI-Assisted)
-
-```bash
-cd product-demos
-cursor .
-```
-
-**Final setup prompt:**
-```
-I've completed the Red Hat demo environment setup. Please:
-
-1. Create a new demo directory in the appropriate category (linux/cloud/network/etc.)
-2. Set up the standard Red Hat demo structure following official guidelines
-3. Configure the demo's automation framework with Ansible best practices
-```
-
----
-
-## ⚡ Alternative: Manual Setup
-
-If you prefer manual setup without AI assistance:
-
-1. **Fork both repositories** (same as Phase 1 above)
-2. **Follow the detailed [Setup Guide](SETUP_GUIDE.md)** step by step
-3. **Manual installation** of all tools and configuration
-
----
-
-## 🎯 What This Environment Provides
-
-### Enhanced Red Hat Demo Development
-- **AI-Assisted Coding**: Cursor IDE + Claude for intelligent code generation
-- **Automated Best Practices**: Real-time Red Hat standards compliance
-- **Streamlined Workflow**: Direct integration with [Red Hat Product Demos](https://github.com/ansible/product-demos)
-- **Quality Assurance**: Automated linting, testing, and validation
-
-### Technology Stack Integration
-- **Infrastructure**: Terraform + AWS
-- **Automation**: Ansible Automation Platform + Event Driven Ansible  
-- **Containers**: OpenShift + Podman
-- **Security**: HashiCorp Vault + Red Hat Advanced Cluster Security
-- **Templating**: Jinja2 for dynamic configurations
-- **AI Tools**: Cursor IDE + Claude + Essential MCP Servers:
-  - Ansible Automation Platform integration
-  - AWS suite (Documentation, EKS, ECS, CDK, Cost Analysis)
-  - HashiCorp Terraform official server
-  - GitHub official server
-  - Kubernetes management
-  - Docker operations
-
-## 🏗️ How It Works
-
-```
-Traditional Red Hat Demo Development:
-Edit demo → Manual testing → Submit PR → Review → Merge
-
-AI-Enhanced Development:
-AI-assisted editing → Auto-validation → Enhanced testing → Intelligent PR → Review → Merge
-```
-
-### Integration with Official Red Hat Demos
-
-This environment **enhances** the [Red Hat Product Demos repository](https://github.com/ansible/product-demos), it doesn't replace it:
-
-1. **Fork/Clone** existing demos from the main repository
-2. **Enhance** them using AI-assisted development  
-3. **Validate** automatically with Red Hat best practices
-4. **Contribute back** to the community repository
-
-## 📁 Project Structure After Setup
+## 📁 Project Structure
 
 ```
 my-redhat-demo-workspace/
@@ -226,21 +69,11 @@ my-redhat-demo-workspace/
 └── .cursor -> RedHat-Demo-AI-IDE/.cursor  # Symlink for IDE config
 ```
 
-## 🔧 Available Commands (After Setup)
-
-```bash
-# Development workflow
-make setup                    # Initial environment setup
-make lint                     # Run all linters
-make validate                 # Run environment validation
-make test                     # Run all tests
-```
-
 ## 🤝 Contributing to Red Hat Demos
 
 ### Enhanced Contribution Workflow
 
-1. **Setup** this AI-enhanced environment (using the phases above)
+1. **Setup** this AI-enhanced environment (using one of the installation options above)
 2. **Navigate** to the product-demos directory
 3. **Create/Enhance** demos using AI assistance
 4. **Validate** automatically with built-in quality checks
@@ -255,53 +88,15 @@ git remote -v
 # Should show:
 # origin    https://github.com/YOUR-USERNAME/product-demos.git (your fork)
 # upstream  https://github.com/ansible/product-demos.git (official)
-
-# 2. Always pull latest changes from upstream before starting work
-git fetch upstream
-git checkout main
-git merge upstream/main
-git push origin main  # Update your fork
-
-# 3. Create feature branch for your work
-git checkout -b feature/my-awesome-demo
-
-# 4. Develop with AI assistance in Cursor
-# ... make changes ...
-
-# 5. Push to YOUR FORK (origin)
-git add .
-git commit -m "Add awesome new demo with AI enhancements"
-git push origin feature/my-awesome-demo
-
-# 6. Create PR on GitHub from your fork to official repository
-# Visit: https://github.com/ansible/product-demos
-# GitHub will show a banner to create PR from your recently pushed branch
 ```
 
-## 📚 Documentation
+## License
 
-- **[Complete Setup Guide](SETUP_GUIDE.md)** - Detailed manual setup instructions
-- **[MCP Servers Guide](docs/MCP_SERVERS.md)** - Comprehensive 11-server MCP configuration
-- **[Development Workflow](docs/DEVELOPMENT_WORKFLOW.md)** - AI-assisted development patterns
-- **[Contributing Guidelines](CONTRIBUTING.md)** - How to contribute to Red Hat demos
-- **[Troubleshooting](docs/TROUBLESHOOTING.md)** - Common issues and solutions
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🆘 Getting Help
+## Acknowledgments
 
-### For Environment Setup Issues
-- Review the [Setup Guide](SETUP_GUIDE.md)
-- Check [Troubleshooting](docs/TROUBLESHOOTING.md)
-- Ask Claude in Cursor chat for assistance
-
-### For Red Hat Demo Development
-- [Red Hat Product Demos Documentation](https://github.com/ansible/product-demos)
-- [Red Hat Customer Portal](https://access.redhat.com)
-- [Ansible Documentation](https://docs.ansible.com)
-
-## 🏷️ Tags
-
-`ansible` `terraform` `openshift` `aws` `vault` `automation` `ai-assisted` `cursor-ide` `red-hat` `demos`
-
----
-
-**Ready to start?** Begin with Phase 1 above - fork the repositories, then follow each phase in order! 🚀 
+- **Red Hat Community** for excellent documentation and tools
+- **HashiCorp** for robust infrastructure tools
+- **Ansible Community** for automation excellence
+- **Open Source Community** for continuous innovation
