@@ -72,7 +72,12 @@ The one-click setup automatically:
 
 1. **Creates workspace structure**
 2. **Forks and clones repositories** with proper git remotes
-3. **Installs all CLI tools** (Terraform, Ansible, AWS CLI, Kubernetes tools, etc.)
+3. **Interactive tool installation** with smart detection:
+   - Asks permission before installing each development tool
+   - Automatically skips tools already installed on your system
+   - Respects existing environments (won't break current Python/Node.js setups)
+   - Includes Cursor IDE installation and configuration
+   - Choose between interactive mode or install-all mode
 4. **Configures Cursor IDE** with extensions and settings
 5. **Sets up pre-commit hooks** and development tools
 6. **Creates helper scripts** for common tasks
@@ -84,6 +89,15 @@ The one-click setup automatically:
    - Kubernetes management server
    - Docker operations server
 8. **Validates the environment** and reports any issues
+
+**Tool Installation Options:**
+- **Interactive Mode** (Default): Ask for permission before installing each tool
+- **Install All Mode**: Use `--skip-tools` to skip tool installation entirely
+- **Manual Installation**: Run `./RedHat-Demo-AI-IDE/scripts/install-tools.sh` later with these options:
+  - `./scripts/install-tools.sh` - Interactive mode (ask for each tool)
+  - `./scripts/install-tools.sh --yes` - Install all tools without prompts
+  - `./scripts/install-tools.sh --force` - Force reinstall even if tools exist
+  - `./scripts/install-tools.sh --help` - Show all available options
 
 ⏭️ **After automation completes**: Skip to [Final Configuration](#final-configuration) section.
 
@@ -99,6 +113,39 @@ The one-click setup automatically:
 - DevOps Teams wanting AI-assisted development practices
 
 ### Manual Setup Steps
+
+**NEW: Automated Tool Installation Option**
+
+Even in manual setup, you can use our improved automated tool installation script:
+
+```bash
+# After cloning the RedHat-Demo-AI-IDE repository:
+cd RedHat-Demo-AI-IDE
+
+# Interactive installation (recommended)
+./scripts/install-tools.sh
+# - Asks permission before installing each tool
+# - Automatically skips tools already installed
+# - Won't interfere with existing environments
+
+# Install all tools without prompts
+./scripts/install-tools.sh --yes
+
+# Force reinstall even if tools exist
+./scripts/install-tools.sh --force
+
+# Get help and see all options
+./scripts/install-tools.sh --help
+```
+
+**Features:**
+- ✅ **Smart Detection**: Automatically detects and skips already installed tools
+- ✅ **User Control**: Ask permission before installing each tool
+- ✅ **Environment Respect**: Won't break existing Python, Node.js, or other setups
+- ✅ **Cursor IDE**: Includes automatic Cursor IDE installation and configuration
+- ✅ **Cross-Platform**: Works on macOS, Linux, and Windows WSL2
+
+**Or continue with manual installation steps below:**
 
 #### Step 1: Install Core Development Tools
 
@@ -437,54 +484,7 @@ Replace these placeholders with your actual credentials:
 - `YOUR_AWS_ACCESS_KEY_ID_HERE` 
 - `YOUR_AWS_SECRET_ACCESS_KEY_HERE`
 - `YOUR_ANSIBLE_TOWER_HOST_HERE` (if using AAP)
-- `YOUR_ANSIBLE_TOWER_USERNAME_HERE` (if using AAP)
-- `YOUR_ANSIBLE_TOWER_PASSWORD_HERE` (if using AAP)
-- `YOUR_TERRAFORM_CLOUD_TOKEN_HERE` (if using Terraform Cloud)
-- `YOUR_KUBECONFIG_PATH_HERE` (if using Kubernetes)
-
-#### Step 8: Set Up Development Environment
-
-**Configure Python environment:**
-```bash
-# Create project-specific virtual environment
-python3 -m venv venv
-source venv/bin/activate
-
-# Install Python dependencies
-pip install -r requirements.txt
-```
-
-**Install Ansible collections:**
-```bash
-# Install required Ansible collections
-ansible-galaxy collection install -r requirements.yml
-```
-
-**Configure pre-commit hooks:**
-```bash
-# Install pre-commit hooks
-pre-commit install
-
-# Test hooks (optional)
-pre-commit run --all-files
-```
-
-#### Step 9: Validate Environment
-
-**Run validation script:**
-```bash
-# Make validation script executable and run it
-chmod +x scripts/validate-environment.sh
-./scripts/validate-environment.sh
-```
-
-This will check:
-- All required tools are installed
-- API keys are configured
-- Git repositories are properly set up
-- Cursor IDE configuration is correct
-
----
+- `YOUR_ANSIBLE_TOWER_USERNAME_HERE`
 
 ## 🔧 Final Configuration
 
@@ -537,17 +537,57 @@ Your AI-enhanced Red Hat demo development environment is now configured with:
 
 ## 🆘 Troubleshooting
 
-**Common Issues:**
+### Common Issues
 
-- **"GitHub clone failed"**: Check your GitHub username and SSH key configuration
+**Tool Installation Problems:**
+- **"Tool already installed"**: The script automatically detects and skips already installed tools
+- **"Permission denied"**: Run `./scripts/install-tools.sh` without sudo - it will ask for permissions when needed
+- **"Python environment conflict"**: The script respects existing virtual environments and won't interfere
+- **"Tool not found after installation"**: Restart your terminal or run `source ~/.bashrc` (Linux) or `source ~/.zshrc` (macOS)
+
+**Setup Script Issues:**
+- **"GitHub clone failed"**: Check your GitHub username and personal access token
 - **"MCP servers not connecting"**: Verify API keys in `.cursor/mcp.json`
-- **"Tool not found"**: Re-run the installation steps for missing tools
-- **"Permission denied"**: Check file permissions and run with proper user privileges
+- **"Cursor IDE not found"**: The script will attempt to install Cursor automatically, or download manually from [cursor.sh](https://cursor.sh/)
+- **"Symlink creation failed"**: Check directory permissions and ensure you're in the correct workspace directory
 
-**Getting Help:**
-- Check [docs/TROUBLESHOOTING.md](./docs/TROUBLESHOOTING.md)
-- Review logs in `~/.cursor/logs/`
-- Open an issue in the [GitHub repository](https://github.com/sibilleb/RedHat-Demo-AI-IDE/issues)
+**Environment Specific:**
+- **macOS**: If Homebrew commands fail, install Homebrew first: `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"`
+- **Linux**: If package manager commands fail, update first: `sudo apt update && sudo apt upgrade -y`
+- **Windows WSL2**: Ensure you're running in a Linux environment, not Windows PowerShell
+
+### Tool Installation Recovery
+
+If tool installation fails or you want to reinstall specific tools:
+
+```bash
+# Re-run interactive installation (will skip already installed tools)
+./scripts/install-tools.sh
+
+# Force reinstall all tools
+./scripts/install-tools.sh --force
+
+# Install specific tools manually:
+# Terraform
+brew install terraform  # macOS
+# or
+curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg  # Linux
+
+# Ansible
+pip3 install ansible ansible-core
+
+# AWS CLI
+brew install awscli  # macOS
+# or
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && unzip awscliv2.zip && sudo ./aws/install  # Linux
+```
+
+### Getting Help
+
+- **Check tool-specific help**: `./scripts/install-tools.sh --help`
+- **View installation logs**: Check terminal output for specific error messages
+- **Validate environment**: Run `./scripts/validate-environment.sh` to check what's missing
+- **Community support**: Open an issue in the [GitHub repository](https://github.com/sibilleb/RedHat-Demo-AI-IDE/issues)
 
 ## Security Considerations
 
@@ -574,62 +614,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Acknowledgments
 
 - **Red Hat Community** for excellent documentation and tools
-- **HashiCorp** for robust infrastructure tools
+- **HashiCorp** for robust infrastructure tools  
 - **Ansible Community** for automation excellence
 - **Open Source Community** for continuous innovation
-
----
-
-## Summary
-
-This setup guide provides two paths to create an AI-enhanced development environment for Red Hat demo development:
-
-### One-Click Setup Benefits
-- **5-minute setup** from zero to productive development
-- **Consistent environment** across all team members
-- **Best practices** automatically configured
-- **Production-ready** configuration
-
-### Manual Setup Benefits
-- **Complete understanding** of all components
-- **Customization opportunities** for specific needs
-- **Learning experience** for the technology stack
-- **Troubleshooting knowledge** for complex environments
-
-### Key Value Propositions
-
-**Traditional Red Hat Demo Development:**
-- Manual coding and testing
-- Standard IDE experience
-- Manual best practices enforcement
-- Individual knowledge silos
-
-**AI-Enhanced Development with This Environment:**
-- Cursor IDE + Claude for intelligent code generation
-- Automated Red Hat standards compliance
-- Real-time validation and suggestions
-- Shared AI knowledge across team
-- Seamless integration with existing workflows
-
-### For Red Hat Teams
-
-1. **Faster Demo Creation**: AI assistance accelerates development by 3-5x
-2. **Higher Quality**: Automated validation ensures Red Hat standards compliance
-3. **Better Consistency**: AI learns from existing demo patterns and enforces them
-4. **Easier Contributions**: Streamlined workflow for contributing back to official repos
-5. **Knowledge Transfer**: Modern development practices shared across entire team
-6. **Reduced Onboarding**: New team members productive in hours instead of days
-
-### Integration Points
-
-- **Direct integration** with [ansible/product-demos](https://github.com/ansible/product-demos)
-- **Compatible** with [demo.redhat.com](https://demo.redhat.com) environments
-- **Supports** existing Red Hat collections and Automation Hub workflows
-- **Enhances** current contribution processes without disrupting them
-
----
-
-**Environment Version**: 2.0.0 (AI-Enhanced)  
-**Compatible with**: Red Hat Product Demos Repository  
-**Maintained by**: Red Hat Solutions Architecture Community  
-**Setup completed**: $(date) 

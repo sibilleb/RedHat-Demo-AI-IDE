@@ -43,11 +43,38 @@ chmod +x setup.sh
 ./scripts/start-demo-development.sh
 ```
 
+**What happens during setup:**
+- **Interactive Tool Installation**: You'll be asked if you want to install development tools
+- **Smart Detection**: Tools already installed on your system are automatically skipped
+- **Your Choice**: Choose between interactive mode (ask for each tool) or install all tools
+- **Respects Your Environment**: Won't interfere with existing Python, Node.js, or other setups
+- **Includes Cursor IDE**: Automatically installs and configures Cursor IDE for AI-assisted development
+
+**Installation modes available:**
+1. **Interactive** (Recommended): Ask permission for each tool individually
+2. **Install All**: Install all tools without prompts (`--yes` flag)
+3. **Skip Tools**: Skip tool installation entirely (`--skip-tools` flag)
+
 For detailed information about what the one-click setup does, see the [Setup Guide](SETUP_GUIDE.md#🚀-option-1-one-click-automated-setup-recommended).
 
 ### Option 2: Manual Setup
 
 If you prefer to understand each step or need more control over the setup process, follow our [Manual Setup Guide](SETUP_GUIDE.md#📖-option-2-manual-setup-educational).
+
+**Manual tool installation options:**
+```bash
+# Interactive installation (ask for each tool)
+./scripts/install-tools.sh
+
+# Install all tools without prompts
+./scripts/install-tools.sh --yes
+
+# Force reinstall even if tools exist
+./scripts/install-tools.sh --force
+
+# Get help and see all options
+./scripts/install-tools.sh --help
+```
 
 ## 📁 Project Structure
 
