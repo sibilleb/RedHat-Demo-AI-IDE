@@ -72,23 +72,19 @@ This repository provides an AI-assisted development environment for creating and
 
    Please:
 
-   1. Create the workspace directory structure:
-      - Create directory: my-redhat-demo-workspace
-      - cd into my-redhat-demo-workspace
-
-   2. Clone my forked repositories:
+   1. Clone my forked repositories:
       - https://github.com/[YOUR-USERNAME]/RedHat-Demo-AI-IDE  
       - https://github.com/[YOUR-USERNAME]/product-demos
 
-   3. Set up git remotes for both repositories:
+   2. Set up git remotes for both repositories:
       - origin: my forks (for pushing changes)
       - upstream: original repos (for pulling updates)
 
-   4. Create the required symlinks:
+   3. Create the required symlinks:
       - Create .cursor -> RedHat-Demo-AI-IDE/.cursor in workspace root
       - Create .cursor -> ../RedHat-Demo-AI-IDE/.cursor in product-demos directory
 
-   5. Verify the setup:
+   4. Verify the setup:
       - Check both repositories were cloned
       - Verify git remotes are configured properly
       - Confirm both symlinks exist and point to the correct locations
