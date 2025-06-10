@@ -204,16 +204,46 @@ cd ..
 # Step 5: Install CLI tools (if not skipped)
 if [[ "$SKIP_TOOLS" != true ]]; then
     print_step "Installing CLI tools and dependencies"
-    cd "$SETUP_REPO_NAME"
     
-    # Make install script executable and run it
-    chmod +x scripts/install-tools.sh
-    ./scripts/install-tools.sh
+    echo -e "${YELLOW}The setup can install development tools for you (Terraform, Ansible, AWS CLI, etc.)${NC}"
+    echo -e "${YELLOW}Tools already installed on your system will be automatically skipped.${NC}"
+    echo ""
+    echo -e "${YELLOW}Install development tools? (y/N)${NC}"
+    read -r install_tools_response
     
-    print_success "CLI tools installation completed"
-    cd ..
+    if [[ "$install_tools_response" =~ ^[Yy]$ ]]; then
+        cd "$SETUP_REPO_NAME"
+        
+        # Make install script executable and run it with appropriate flags
+        chmod +x scripts/install-tools.sh
+        
+        echo -e "${YELLOW}Choose installation mode:${NC}"
+        echo -e "${WHITE}1. Interactive (ask for each tool) - Recommended${NC}"
+        echo -e "${WHITE}2. Install all tools (skip prompts)${NC}"
+        echo -e "${YELLOW}Enter choice (1 or 2): ${NC}"
+        read -r install_mode
+        
+        case $install_mode in
+            1)
+                ./scripts/install-tools.sh
+                ;;
+            2)
+                ./scripts/install-tools.sh --yes
+                ;;
+            *)
+                print_info "Invalid choice, using interactive mode"
+                ./scripts/install-tools.sh
+                ;;
+        esac
+        
+        print_success "CLI tools installation completed"
+        cd ..
+    else
+        print_info "Skipping CLI tools installation"
+        echo -e "${CYAN}You can install tools later by running: ./RedHat-Demo-AI-IDE/scripts/install-tools.sh${NC}"
+    fi
 else
-    print_info "Skipping CLI tools installation"
+    print_info "Skipping CLI tools installation (--skip-tools flag used)"
 fi
 
 # Step 6: Set up Python environment and requirements
