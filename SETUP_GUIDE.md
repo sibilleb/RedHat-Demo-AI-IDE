@@ -519,6 +519,7 @@ In Cursor IDE:
 2. Type **"MCP"** 
 3. Verify you see 10 MCP servers connected
 4. Test AI integration with a simple prompt
+```
 
 ## 🎯 You're Ready!
 
@@ -544,7 +545,9 @@ Your AI-enhanced Red Hat demo development environment is now configured with:
 - **"Permission denied"**: Run `./scripts/install-tools.sh` without sudo - it will ask for permissions when needed
 - **"Python environment conflict"**: The script respects existing virtual environments and won't interfere
 - **"externally-managed-environment" error**: The script automatically detects this and uses virtual environments for all Python packages
+- **"User site-packages are not visible in this virtualenv" error**: The script now properly handles active virtual environments and switches to the correct one
 - **"Virtual environment not working"**: Run `./scripts/test-virtual-env.sh` to verify virtual environment functionality
+- **"Python package installation issues"**: Run `./scripts/test-python-install.sh` to test package installation in different virtual environment scenarios
 - **"Tool not found after installation"**: Restart your terminal or run `source ~/.bashrc` (Linux) or `source ~/.zshrc` (macOS)
 
 **Setup Script Issues:**
@@ -565,6 +568,9 @@ If tool installation fails or you want to reinstall specific tools:
 ```bash
 # Test virtual environment handling first (recommended)
 ./scripts/test-virtual-env.sh
+
+# Test Python package installation specifically
+./scripts/test-python-install.sh
 
 # Re-run interactive installation (will skip already installed tools)
 ./scripts/install-tools.sh
