@@ -316,6 +316,41 @@ cd product-demos
 # Set up git remotes
 git remote add upstream https://github.com/ansible/product-demos.git
 git remote set-url origin https://github.com/YOUR_USERNAME/product-demos.git
+
+# Return to workspace root
+cd ..
+```
+
+**Create required symlinks:**
+```bash
+# Create .cursor symlink in workspace root
+ln -s RedHat-Demo-AI-IDE/.cursor .cursor
+
+# Create .cursor symlink in product-demos directory
+ln -s ../RedHat-Demo-AI-IDE/.cursor product-demos/.cursor
+```
+
+**Verify the setup:**
+```bash
+# Check symlinks
+ls -la .cursor
+ls -la product-demos/.cursor
+
+# Verify git remotes for RedHat-Demo-AI-IDE
+cd RedHat-Demo-AI-IDE
+git remote -v
+cd ..
+
+# Verify git remotes for product-demos
+cd product-demos
+git remote -v
+cd ..
+```
+
+The output should show:
+- Both `.cursor` symlinks exist and point to the correct locations
+- Both repositories have `origin` pointing to your fork
+- Both repositories have `upstream` pointing to the original repos
 ```
 
 #### Step 6: Configure Cursor IDE
