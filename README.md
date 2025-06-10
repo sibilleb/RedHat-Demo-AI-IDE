@@ -1,215 +1,176 @@
-# Red Hat Demo Development Environment - AI-Assisted Automation with Cursor IDE
+# Red Hat Demo AI Development Environment
 
-This repository provides a modern, AI-assisted development environment for creating and contributing to [Red Hat Product Demos](https://github.com/ansible/product-demos) using Cursor IDE, Claude AI, and agentic coding practices.
+**AI-Enhanced Red Hat Demo Development with Cursor IDE + Claude**
 
-## 🎯 Project Overview
+This repository provides an AI-assisted development environment for creating and enhancing [Red Hat Product Demos](https://github.com/ansible/product-demos) using modern tools like Cursor IDE, Claude AI, Ansible Automation Platform, Terraform, OpenShift, and Event Driven Ansible.
 
-This development environment enhances the [official Red Hat product demos workflow](https://github.com/ansible/product-demos) by providing:
+## 🚀 Quick Start (Recommended)
 
-- **AI-Assisted Development**: Cursor IDE + Claude for intelligent code generation and review
-- **Automated Best Practices**: MCP servers for real-time guidance and validation
-- **Enhanced Productivity**: Streamlined workflows for demo creation and modification
-- **Quality Assurance**: Automated linting, testing, and Red Hat standards compliance
-- **Seamless Integration**: Direct workflow for contributing back to the main Red Hat demos repository
+### Option 1: AI-Assisted Setup with Cursor (Easiest)
 
-### 🔗 Integration with Red Hat Product Demos
+1. **Create your project directory:**
+   ```bash
+   mkdir my-redhat-demo-workspace
+   cd my-redhat-demo-workspace
+   cursor .
+   ```
 
-This environment is designed to work **with** the [Red Hat Product Demos repository](https://github.com/ansible/product-demos), not replace it. Use this setup to:
+2. **Paste this prompt into Cursor chat:**
+   ```
+   I want to set up an AI-enhanced Red Hat demo development environment. Please:
 
-1. **Fork and enhance** existing demos from the main repository
-2. **Create new demos** using AI-assisted development practices  
-3. **Contribute back** to the community repository with higher quality code
-4. **Follow Red Hat standards** automatically through intelligent tooling
+   1. Clone the setup repository: https://github.com/sibilleb/RedHat-Demo-AI-IDE
+   2. Clone the official Red Hat demos: https://github.com/ansible/product-demos  
+   3. Set up the directory structure for AI-enhanced development
+   4. Install required CLI tools (terraform, ansible, vault, aws-cli, oc, helm, podman)
+   5. Configure Cursor with the proper rules and MCP servers
+   6. Create a sample MCP configuration template
+   7. Set up the integration between this enhanced environment and the Red Hat demos
+   8. Provide me with next steps to start developing demos with AI assistance
 
-## 🏗️ Project Structure
+   My operating system is: [macOS/Linux/Windows]
+   I have access to: [AWS account yes/no] [Red Hat developer account yes/no]
+   ```
+
+3. **Follow Claude's guided setup** - it will walk you through the entire process automatically.
+
+### Option 2: Manual Setup
+
+If you prefer manual setup, follow the detailed [Setup Guide](SETUP_GUIDE.md).
+
+## 🎯 What This Environment Provides
+
+### Enhanced Red Hat Demo Development
+- **AI-Assisted Coding**: Cursor IDE + Claude for intelligent code generation
+- **Automated Best Practices**: Real-time Red Hat standards compliance
+- **Streamlined Workflow**: Direct integration with [Red Hat Product Demos](https://github.com/ansible/product-demos)
+- **Quality Assurance**: Automated linting, testing, and validation
+
+### Technology Stack Integration
+- **Infrastructure**: Terraform + AWS
+- **Automation**: Ansible Automation Platform + Event Driven Ansible  
+- **Containers**: OpenShift + Podman
+- **Security**: HashiCorp Vault + Red Hat Advanced Cluster Security
+- **Templating**: Jinja2 for dynamic configurations
+- **AI Tools**: Cursor IDE + Claude + MCP Servers
+
+## 🏗️ How It Works
 
 ```
-ansible-dev-ide/
-├── .cursor/                        # Cursor IDE configuration
-│   ├── mcp.json                   # MCP servers configuration
-│   └── rules/                     # Development rules and best practices
-├── ansible/                       # Ansible automation content
-│   ├── inventories/               # Environment-specific inventories
-│   │   ├── dev/                   
-│   │   ├── staging/               
-│   │   └── prod/                  
-│   ├── playbooks/                 # Ansible playbooks
-│   │   ├── site.yml              # Main orchestration playbook
-│   │   ├── aap-install.yml       # AAP installation
-│   │   ├── openshift-deploy.yml  # OpenShift deployment
-│   │   └── vault-setup.yml       # Vault configuration
-│   ├── roles/                     # Ansible roles
-│   │   ├── common/               # Common configuration
-│   │   ├── aap/                  # Ansible Automation Platform
-│   │   ├── openshift/            # OpenShift deployment
-│   │   └── vault/                # HashiCorp Vault
-│   ├── collections/               # Ansible collections
-│   │   └── requirements.yml      # Collection dependencies
-│   ├── group_vars/               # Group-specific variables
-│   ├── host_vars/                # Host-specific variables
-│   ├── ansible.cfg               # Ansible configuration
-│   └── vault_pass.txt           # Vault password file (encrypted)
-├── terraform/                     # Infrastructure as Code
-│   ├── environments/              # Environment-specific configurations
-│   │   ├── dev/                  
-│   │   ├── staging/              
-│   │   └── prod/                 
-│   ├── modules/                   # Reusable Terraform modules
-│   │   ├── vpc/                  # VPC module
-│   │   ├── ec2/                  # EC2 instances
-│   │   ├── rds/                  # Database instances
-│   │   ├── eks/                  # EKS cluster (if needed)
-│   │   └── vault/                # Vault infrastructure
-│   ├── shared/                    # Shared resources
-│   └── .terraform-version        # Terraform version constraint
-├── eda/                          # Event-Driven Ansible
-│   ├── rulebooks/                # EDA rulebooks
-│   │   ├── infrastructure.yml    # Infrastructure events
-│   │   ├── security.yml          # Security events
-│   │   └── monitoring.yml        # Monitoring events
-│   ├── decision-environments/    # Custom decision environments
-│   └── execution-environments/   # Custom execution environments
-├── vault/                        # HashiCorp Vault configuration
-│   ├── policies/                 # Vault policies
-│   ├── config/                   # Vault configuration files
-│   └── scripts/                  # Vault setup scripts
-├── openshift/                    # OpenShift manifests and configs
-│   ├── operators/                # Operator configurations
-│   ├── applications/             # Application deployments
-│   ├── pipelines/                # Tekton pipelines
-│   └── monitoring/               # Monitoring configurations
-├── docs/                         # Documentation
-│   ├── architecture/             # Architecture diagrams
-│   ├── runbooks/                 # Operational runbooks
-│   └── demos/                    # Demo scripts and guides
-├── scripts/                      # Utility scripts
-│   ├── setup/                    # Environment setup scripts
-│   ├── deployment/               # Deployment automation
-│   └── maintenance/              # Maintenance scripts
-├── tests/                        # Testing configurations
-│   ├── molecule/                 # Molecule testing for Ansible
-│   ├── terraform/                # Terraform testing
-│   └── integration/              # Integration tests
-├── .github/                      # GitHub Actions workflows
-│   └── workflows/                # CI/CD pipelines
-├── .gitignore                    # Git ignore patterns
-├── .pre-commit-config.yaml       # Pre-commit hooks
-├── Makefile                      # Development automation
-└── README.md                     # This file
-```
-
-## 🚀 Quick Start
-
-### Prerequisites
-
-- Follow the complete [Setup Guide](SETUP_GUIDE.md) for detailed environment configuration
-- Access to [Red Hat Product Demos](https://github.com/ansible/product-demos) repository
-- Red Hat Developer Account for registry access
-- AWS CLI configured with appropriate credentials
-
-### Enhanced Demo Development Workflow
-
-1. **Setup the AI-assisted development environment:**
-   ```bash
-   # Follow the complete setup guide
-   ./scripts/setup-enhanced-environment.sh
-   ```
-
-2. **Fork or work with Red Hat Product Demos:**
-   ```bash
-   # Clone the main Red Hat demos repository
-   git clone https://github.com/ansible/product-demos.git product-demos
-cd product-demos
-   
-   # Setup this enhanced environment for working with demos
-   ln -s ../ansible-dev-ide/.cursor .cursor
-   ln -s ../ansible-dev-ide/scripts scripts/enhanced
-   ```
-
-3. **Create or enhance a demo using AI assistance:**
-   ```bash
-   # Use Cursor IDE with Claude for intelligent development
-   cursor product-demos/
-   
-   # Example: Enhance an existing demo
-   # - Open existing demo in Cursor
-   # - Use Claude for code suggestions and improvements
-   # - Apply automated Red Hat best practices
-   ```
-
-4. **Contribute back to the main repository:**
-   ```bash
-   # Create feature branch
-   git checkout -b feature/enhanced-demo-name
-   
-   # Commit improvements
-   git add .
-   git commit -m "Enhanced demo with AI-assisted improvements"
-   
-   # Push and create PR to main Red Hat demos repo
-   git push origin feature/enhanced-demo-name
-   ```
-
-## 🛠️ AI-Enhanced Development Workflow
-
-This environment enhances the standard Red Hat demo development process:
-
-### Traditional Red Hat Demo Development
-```
+Traditional Red Hat Demo Development:
 Edit demo → Manual testing → Submit PR → Review → Merge
+
+AI-Enhanced Development:
+AI-assisted editing → Auto-validation → Enhanced testing → Intelligent PR → Review → Merge
 ```
 
-### AI-Enhanced Development with This Environment
+### Integration with Official Red Hat Demos
+
+This environment **enhances** the [Red Hat Product Demos repository](https://github.com/ansible/product-demos), it doesn't replace it:
+
+1. **Fork/Clone** existing demos from the main repository
+2. **Enhance** them using AI-assisted development  
+3. **Validate** automatically with Red Hat best practices
+4. **Contribute back** to the community repository
+
+## 📁 Project Structure After Setup
+
 ```
-Edit with AI assistance → Automated validation → Enhanced testing → Intelligent PR → Review → Merge
+my-redhat-demo-workspace/
+├── RedHat-Demo-AI-IDE/           # This setup repository
+│   ├── .cursor/                  # Cursor IDE configuration
+│   │   ├── rules/               # Red Hat development rules
+│   │   └── mcp.json.template    # MCP server template
+│   ├── scripts/                 # Setup and automation scripts
+│   └── docs/                    # Documentation and guides
+├── product-demos/                # Official Red Hat demos repository
+│   ├── linux/                  # RHEL automation demos
+│   ├── windows/                 # Windows Server demos
+│   ├── cloud/                   # Infrastructure demos
+│   ├── network/                 # Network automation
+│   ├── openshift/               # OpenShift demos
+│   └── satellite/               # Satellite demos
+└── .cursor -> RedHat-Demo-AI-IDE/.cursor  # Symlink for IDE config
 ```
 
-#### Enhanced Workflow Steps:
-
-1. **AI-Assisted Development:** Cursor + Claude provide intelligent code suggestions
-2. **Real-time Validation:** MCP servers ensure Red Hat best practices compliance
-3. **Automated Testing:** Enhanced testing with Molecule, Terratest, and custom validators
-4. **Quality Gates:** Pre-commit hooks and automated code review
-5. **Seamless Integration:** Direct workflow for contributing to [rh-product-demos](https://github.com/ansible/product-demos)
-
-## 📋 Available Make Commands
+## 🔧 Available Commands (After Setup)
 
 ```bash
-make setup          # Initial project setup
-make lint           # Run all linters (ansible-lint, tflint, etc.)
-make test           # Run all tests
-make deploy-dev     # Deploy to development environment
-make deploy-staging # Deploy to staging environment
-make deploy-prod    # Deploy to production environment
-make clean          # Clean up temporary files
-make docs           # Generate documentation
+# Project management with TaskMaster AI
+task-master list              # View current tasks
+task-master next              # Find next task to work on
+task-master add-task          # Add new development tasks
+
+# Development workflow
+make setup                    # Initial environment setup
+make lint                     # Run all linters
+make test                     # Execute tests
+make deploy-dev              # Deploy to development environment
+
+# Red Hat demo specific
+./scripts/validate-rh-demo.sh    # Validate demo compliance
+./scripts/enhance-demo.sh         # AI-enhance existing demo
+./scripts/create-demo.sh          # Create new demo from template
 ```
 
-## 🔧 Technology Stack
+## 📋 Prerequisites
 
-- **Infrastructure:** Terraform, AWS, HashiCorp Vault
-- **Automation:** Ansible Automation Platform, Event-Driven Ansible
-- **Containers:** OpenShift, Podman, Docker
-- **CI/CD:** GitHub Actions, Tekton Pipelines
-- **Development:** Cursor IDE, Claude AI, MCP Servers
-- **Testing:** Molecule, Terratest, pytest
-- **Documentation:** Markdown, Draw.io
+- **System**: macOS, Linux, or Windows with WSL2 (16GB+ RAM recommended)
+- **Access**: Red Hat Developer Account, AWS Account (optional), GitHub Account
+- **Tools**: Git, Cursor IDE (or VS Code), Terminal access
+
+## 🤝 Contributing to Red Hat Demos
+
+### Enhanced Contribution Workflow
+
+1. **Setup** this AI-enhanced environment (using the Cursor prompt above)
+2. **Navigate** to the product-demos directory
+3. **Create/Enhance** demos using AI assistance
+4. **Validate** automatically with built-in quality checks
+5. **Submit** improved demos back to the main repository
+
+### Example: Enhancing an Existing Demo
+
+```bash
+# Navigate to demos and open in Cursor
+cd product-demos/linux/existing-demo
+cursor .
+
+# Ask Claude to enhance the demo
+# "Please review this demo and suggest improvements following Red Hat best practices"
+
+# Validate changes
+../../RedHat-Demo-AI-IDE/scripts/validate-rh-demo.sh
+
+# Submit PR with enhancements
+git checkout -b enhance/existing-demo
+git commit -m "AI-enhanced demo with improved practices"
+git push origin enhance/existing-demo
+```
 
 ## 📚 Documentation
 
-- [Architecture Overview](docs/architecture/README.md)
-- [Deployment Guide](docs/runbooks/deployment.md)
-- [Troubleshooting](docs/runbooks/troubleshooting.md)
-- [Demo Scripts](docs/demos/README.md)
+- **[Complete Setup Guide](SETUP_GUIDE.md)** - Detailed manual setup instructions
+- **[Development Workflow](docs/DEVELOPMENT_WORKFLOW.md)** - AI-assisted development patterns
+- **[Contributing Guidelines](CONTRIBUTING.md)** - How to contribute to Red Hat demos
+- **[Troubleshooting](docs/TROUBLESHOOTING.md)** - Common issues and solutions
 
-## 🤝 Contributing
+## 🆘 Getting Help
 
-Please read our [contributing guidelines](CONTRIBUTING.md) before submitting pull requests.
+### For Environment Setup Issues
+- Review the [Setup Guide](SETUP_GUIDE.md)
+- Check [Troubleshooting](docs/TROUBLESHOOTING.md)
+- Ask Claude in Cursor chat for assistance
 
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+### For Red Hat Demo Development
+- [Red Hat Product Demos Documentation](https://github.com/ansible/product-demos)
+- [Red Hat Customer Portal](https://access.redhat.com)
+- [Ansible Documentation](https://docs.ansible.com)
 
 ## 🏷️ Tags
 
-`ansible` `terraform` `openshift` `aws` `vault` `automation` `devops` `gitops` `infrastructure-as-code` `event-driven-ansible` 
+`ansible` `terraform` `openshift` `aws` `vault` `automation` `ai-assisted` `cursor-ide` `red-hat` `demos`
+
+---
+
+**Ready to start?** Create a directory, open it in Cursor, and paste the setup prompt above! 🚀 

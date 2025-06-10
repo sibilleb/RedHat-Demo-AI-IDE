@@ -1,316 +1,211 @@
 #!/bin/bash
 
-set -euo pipefail
+# Red Hat Demo AI Development Environment Setup
+# This script sets up the complete AI-enhanced development environment
 
-# Colors for output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m' # No Color
+set -e
 
-# Script configuration
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
-WORKSPACE_DIR="${HOME}/redhat-demo-workspace"
-RH_DEMOS_REPO="https://github.com/ansible/product-demos.git"
+echo "🚀 Setting up Red Hat Demo AI Development Environment..."
 
-echo -e "${BLUE}=== Red Hat Product Demos Integration Setup ===${NC}"
-echo "This script sets up integration with the official Red Hat product demos repository"
-echo "Repository: ${RH_DEMOS_REPO}"
-echo ""
+# Get current directory
+WORKSPACE_DIR=$(pwd)
+echo "📁 Workspace Directory: $WORKSPACE_DIR"
 
-# Function to print status messages
-print_status() {
-    echo -e "${GREEN}[INFO]${NC} $1"
+# Function to check if command exists
+command_exists() {
+    command -v "$1" >/dev/null 2>&1
 }
 
-print_warning() {
-    echo -e "${YELLOW}[WARNING]${NC} $1"
-}
-
-print_error() {
-    echo -e "${RED}[ERROR]${NC} $1"
-}
-
-# Check prerequisites
-check_prerequisites() {
-    print_status "Checking prerequisites..."
+# Function to install via Homebrew (macOS)
+install_homebrew_tools() {
+    echo "🍺 Installing tools via Homebrew..."
     
-    # Check if git is installed
-    if ! command -v git &> /dev/null; then
-        print_error "Git is not installed. Please install git first."
-        exit 1
+    # Install Homebrew if not present
+    if ! command_exists brew; then
+        echo "Installing Homebrew..."
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     fi
     
-    # Check if ansible is installed
-    if ! command -v ansible &> /dev/null; then
-        print_error "Ansible is not installed. Please run the main setup guide first."
-        exit 1
-    fi
+    # Essential tools
+    brew install terraform ansible vault awscli kubernetes-cli helm openshift-cli podman
     
-    # Check if cursor is available
-    if ! command -v cursor &> /dev/null; then
-        print_warning "Cursor IDE not found in PATH. You may need to install it manually."
-    fi
+    # Development tools
+    brew install jq yq tree watch htop
+    brew install hadolint shellcheck
     
-    print_status "Prerequisites check completed."
+    # Python tools
+    pip3 install ansible-lint molecule yamllint pre-commit jinja2 jinja2-cli j2cli
 }
 
-# Create workspace directory
-setup_workspace() {
-    print_status "Setting up workspace directory: ${WORKSPACE_DIR}"
+# Function to install via apt (Linux)
+install_apt_tools() {
+    echo "📦 Installing tools via apt..."
     
-    if [ ! -d "$WORKSPACE_DIR" ]; then
-        mkdir -p "$WORKSPACE_DIR"
-        print_status "Created workspace directory: ${WORKSPACE_DIR}"
-    else
-        print_status "Workspace directory already exists: ${WORKSPACE_DIR}"
-    fi
+    sudo apt update
+    
+    # Add HashiCorp repository
+    wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+    echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+    
+    sudo apt update
+    sudo apt install -y terraform vault
+    
+    # Other tools
+    sudo apt install -y jq tree watch htop shellcheck
+    
+    # AWS CLI
+    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+    unzip awscliv2.zip
+    sudo ./aws/install
+    rm -rf awscliv2.zip aws/
+    
+    # Kubernetes tools
+    curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+    chmod +x kubectl
+    sudo mv kubectl /usr/local/bin/
+    
+    # Helm
+    curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+    
+    # OpenShift CLI
+    curl -LO https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-client-linux.tar.gz
+    tar -xzf openshift-client-linux.tar.gz
+    sudo mv oc kubectl /usr/local/bin/
+    rm -f openshift-client-linux.tar.gz oc kubectl
+    
+    # Python tools
+    pip3 install ansible ansible-lint molecule yamllint pre-commit jinja2 jinja2-cli j2cli
 }
 
-# Clone Red Hat demos repository
-clone_rh_demos() {
-    print_status "Cloning Red Hat product demos repository..."
-    
+# Detect OS and install tools
+echo "🔍 Detecting operating system..."
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    echo "🍎 macOS detected"
+    install_homebrew_tools
+elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    echo "🐧 Linux detected"
+    install_apt_tools
+else
+    echo "❌ Unsupported operating system: $OSTYPE"
+    echo "Please install tools manually following the Setup Guide"
+    exit 1
+fi
+
+# Clone repositories if not already present
+echo "📥 Setting up repositories..."
+
+if [ ! -d "RedHat-Demo-AI-IDE" ]; then
+    echo "Cloning RedHat-Demo-AI-IDE repository..."
+    git clone https://github.com/sibilleb/RedHat-Demo-AI-IDE.git
+else
+    echo "RedHat-Demo-AI-IDE repository already exists"
+fi
+
+if [ ! -d "product-demos" ]; then
+    echo "Cloning Red Hat Product Demos repository..."
+    git clone https://github.com/ansible/product-demos.git
+else
+    echo "product-demos repository already exists"
+fi
+
+# Set up symlinks for Cursor configuration
+echo "🔗 Setting up Cursor configuration..."
+if [ ! -L ".cursor" ]; then
+    ln -sf "$WORKSPACE_DIR/RedHat-Demo-AI-IDE/.cursor" "$WORKSPACE_DIR/.cursor"
+    echo "Created symlink: .cursor -> RedHat-Demo-AI-IDE/.cursor"
+fi
+
+# Copy MCP template if Cursor directory exists
+if [ -d "$WORKSPACE_DIR/RedHat-Demo-AI-IDE/.cursor" ]; then
+    if [ ! -f "$WORKSPACE_DIR/.cursor/mcp.json" ] && [ -f "$WORKSPACE_DIR/RedHat-Demo-AI-IDE/.cursor/mcp.json.template" ]; then
+        cp "$WORKSPACE_DIR/RedHat-Demo-AI-IDE/.cursor/mcp.json.template" "$WORKSPACE_DIR/.cursor/mcp.json"
+        echo "📋 Copied MCP configuration template to .cursor/mcp.json"
+        echo "⚠️  Please edit .cursor/mcp.json and add your API keys"
+    fi
+fi
+
+# Set up pre-commit hooks
+echo "🎣 Setting up pre-commit hooks..."
+if [ -f "RedHat-Demo-AI-IDE/.pre-commit-config.yaml" ]; then
+    ln -sf "$WORKSPACE_DIR/RedHat-Demo-AI-IDE/.pre-commit-config.yaml" "$WORKSPACE_DIR/.pre-commit-config.yaml"
+    cd "$WORKSPACE_DIR/product-demos"
+    pre-commit install
     cd "$WORKSPACE_DIR"
-    
-    if [ ! -d "product-demos" ]; then
-        git clone "$RH_DEMOS_REPO" product-demos
-        print_status "Successfully cloned Red Hat product demos repository"
-    else
-        print_status "Red Hat demos repository already exists, updating..."
-        cd product-demos
-        git pull origin main
-        cd ..
-    fi
-}
+fi
 
-# Setup enhanced development environment
-setup_enhanced_environment() {
-    print_status "Setting up enhanced development environment..."
-    
-    cd "${WORKSPACE_DIR}/product-demos"
-    
-    # Create symlinks to enhanced development tools
-    if [ ! -L ".cursor" ]; then
-        ln -s "${PROJECT_ROOT}/.cursor" .cursor
-        print_status "Linked Cursor IDE configuration"
-    fi
-    
-    if [ ! -L ".pre-commit-config.yaml" ]; then
-        ln -s "${PROJECT_ROOT}/.pre-commit-config.yaml" .pre-commit-config.yaml
-        print_status "Linked pre-commit configuration"
-    fi
-    
-    if [ ! -d "scripts/enhanced" ]; then
-        mkdir -p scripts
-        ln -s "${PROJECT_ROOT}/scripts" scripts/enhanced
-        print_status "Linked enhanced scripts"
-    fi
-    
-    # Install pre-commit hooks
-    if command -v pre-commit &> /dev/null; then
-        pre-commit install
-        print_status "Installed pre-commit hooks"
-    else
-        print_warning "pre-commit not available, skipping hook installation"
-    fi
-}
+# Initialize TaskMaster (if available)
+echo "📋 Initializing TaskMaster..."
+if command_exists npx; then
+    cd "$WORKSPACE_DIR/RedHat-Demo-AI-IDE"
+    npx task-master-ai init --name="Red Hat Demo Environment" \
+        --description="AI-enhanced Red Hat demo development environment" \
+        --version="1.0.0" \
+        --yes || echo "TaskMaster initialization skipped"
+    cd "$WORKSPACE_DIR"
+fi
 
-# Setup git configuration for contributions
-setup_git_config() {
-    print_status "Setting up Git configuration for Red Hat contributions..."
-    
-    cd "${WORKSPACE_DIR}/product-demos"
-    
-    # Check if user has configured git
-    if ! git config user.name &> /dev/null; then
-        print_warning "Git user.name not configured. Please run:"
-        echo "  git config --global user.name 'Your Name'"
-    fi
-    
-    if ! git config user.email &> /dev/null; then
-        print_warning "Git user.email not configured. Please run:"
-        echo "  git config --global user.email 'your.email@redhat.com'"
-    fi
-    
-    # Add upstream remote if it doesn't exist
-    if ! git remote | grep -q upstream; then
-        git remote add upstream "$RH_DEMOS_REPO"
-        print_status "Added upstream remote"
-    fi
-    
-    print_status "Git configuration completed"
-}
-
-# Create validation script
-create_validation_script() {
-    print_status "Creating validation script..."
-    
-    cat > "${WORKSPACE_DIR}/product-demos/scripts/enhanced/validate-rh-demo-env.sh" << 'EOF'
+# Create helpful scripts
+echo "📝 Creating helper scripts..."
+cat > start-demo-development.sh << 'EOF'
 #!/bin/bash
-
-echo "=== Red Hat Demo Environment Validation ==="
-
-# Check Red Hat demo structure
-echo "Checking Red Hat demo repository structure..."
-required_dirs=("linux" "windows" "cloud" "network" "openshift" "satellite")
-for dir in "${required_dirs[@]}"; do
-    if [ -d "$dir" ]; then
-        echo "  ✅ $dir/ directory found"
-    else
-        echo "  ❌ $dir/ directory missing"
-    fi
-done
-
-# Check Ansible configuration
-echo "Checking Ansible configuration..."
-if [ -f "ansible.cfg" ]; then
-    echo "  ✅ ansible.cfg found"
-else
-    echo "  ❌ ansible.cfg missing"
-fi
-
-# Check collections requirements
-echo "Checking collections requirements..."
-if [ -f "collections/requirements.yml" ]; then
-    echo "  ✅ collections/requirements.yml found"
-    echo "  Collections to be installed:"
-    ansible-galaxy collection list --format json 2>/dev/null | jq -r '.[] | keys[]' | head -5 || echo "    Use: ansible-galaxy collection list"
-else
-    echo "  ❌ collections/requirements.yml missing"
-fi
-
-# Check enhanced tools
-echo "Checking enhanced development tools..."
-if [ -L ".cursor" ]; then
-    echo "  ✅ Cursor IDE configuration linked"
-else
-    echo "  ❌ Cursor IDE configuration not linked"
-fi
-
-if [ -L ".pre-commit-config.yaml" ]; then
-    echo "  ✅ Pre-commit configuration linked"
-else
-    echo "  ❌ Pre-commit configuration not linked"
-fi
-
-echo "=== Validation complete ==="
+echo "🚀 Starting Red Hat Demo Development Environment"
+echo "📁 Opening product-demos in Cursor..."
+cd product-demos
+cursor .
 EOF
 
-    chmod +x "${WORKSPACE_DIR}/product-demos/scripts/enhanced/validate-rh-demo-env.sh"
-    print_status "Created validation script"
-}
+chmod +x start-demo-development.sh
 
-# Install required collections
-install_collections() {
-    print_status "Installing required Ansible collections..."
-    
-    cd "${WORKSPACE_DIR}/product-demos"
-    
-    if [ -f "collections/requirements.yml" ]; then
-        ansible-galaxy collection install -r collections/requirements.yml
-        print_status "Installed required collections"
-    else
-        print_warning "No collections/requirements.yml found, skipping collection installation"
-    fi
-}
+cat > validate-environment.sh << 'EOF'
+#!/bin/bash
+echo "🔍 Validating Environment Setup..."
 
-# Create example workflow
-create_example_workflow() {
-    print_status "Creating example AI-assisted workflow..."
-    
-    cat > "${WORKSPACE_DIR}/product-demos/AI_WORKFLOW_EXAMPLE.md" << 'EOF'
-# AI-Assisted Red Hat Demo Development Workflow
+echo "📋 CLI Tools:"
+terraform version
+ansible --version
+vault version
+aws --version 2>/dev/null || echo "AWS CLI not configured"
+oc version --client 2>/dev/null || echo "OpenShift CLI not found"
+kubectl version --client
+helm version
 
-This document demonstrates how to use the AI-enhanced development environment for creating Red Hat demos.
+echo "🐍 Python Tools:"
+python3 -c "import jinja2; print(f'Jinja2: {jinja2.__version__}')"
+ansible-lint --version
+molecule --version
 
-## Quick Start Example
+echo "🔗 Repository Status:"
+[ -d "RedHat-Demo-AI-IDE" ] && echo "✅ RedHat-Demo-AI-IDE repository present" || echo "❌ Missing RedHat-Demo-AI-IDE"
+[ -d "product-demos" ] && echo "✅ product-demos repository present" || echo "❌ Missing product-demos"
+[ -L ".cursor" ] && echo "✅ Cursor configuration linked" || echo "❌ Cursor configuration not linked"
 
-```bash
-# Navigate to your demo workspace
-cd ~/redhat-demo-workspace/product-demos
-
-# Create a new demo (example: RHEL automation)
-cursor linux/
-
-# Use Claude/Cursor for:
-# 1. Generate playbook templates
-# 2. Create inventory files
-# 3. Write documentation
-# 4. Generate test scenarios
-```
-
-## AI-Assisted Development Tips
-
-1. **Playbook Generation**: Use Claude to generate Ansible playbooks based on requirements
-2. **Documentation**: Auto-generate README files for demo setup
-3. **Test Creation**: Create test scenarios and validation scripts
-4. **Code Review**: Use AI for code review and best practices validation
-5. **Troubleshooting**: Get AI assistance for debugging and optimization
-
-## Integration with Red Hat Standards
-
-- Follow Red Hat Ansible automation best practices
-- Use certified collections from Automation Hub
-- Implement proper error handling and logging
-- Include comprehensive documentation
-
-## Contribution Workflow
-
-1. Create feature branch
-2. Develop with AI assistance
-3. Run automated validation
-4. Submit pull request to upstream
-5. Collaborate with Red Hat team for review
+echo "✅ Environment validation complete!"
 EOF
 
-    print_status "Created example workflow documentation"
-}
+chmod +x validate-environment.sh
 
-# Run validation
-run_validation() {
-    print_status "Running environment validation..."
-    
-    if [ -f "${WORKSPACE_DIR}/product-demos/scripts/enhanced/validate-rh-demo-env.sh" ]; then
-        bash "${WORKSPACE_DIR}/product-demos/scripts/enhanced/validate-rh-demo-env.sh"
-    else
-        print_error "Validation script not found"
-    fi
-}
-
-# Main execution
-main() {
-    print_status "Starting Red Hat Product Demos integration setup..."
-    
-    check_prerequisites
-    setup_workspace
-    clone_rh_demos
-    setup_enhanced_environment
-    setup_git_config
-    create_validation_script
-    install_collections
-    create_example_workflow
-    run_validation
-    
-    echo ""
-    echo -e "${GREEN}🎉 Red Hat Product Demos integration setup completed successfully!${NC}"
-    echo ""
-    echo "Next steps:"
-    echo "1. Navigate to your workspace: cd ${WORKSPACE_DIR}/product-demos"
-    echo "2. Open in Cursor IDE: cursor ."
-    echo "3. Explore existing demos and start developing with AI assistance"
-    echo ""
-    echo "Workspace structure:"
-    echo "  📁 ${WORKSPACE_DIR}/product-demos - Main Red Hat demos repository"
-    echo "  🔧 ${WORKSPACE_DIR}/product-demos/.cursor - Cursor IDE configuration"
-    echo "  🛠️  ${WORKSPACE_DIR}/product-demos/scripts/enhanced - Enhanced development tools"
-    echo ""
-    echo "Happy coding with AI assistance! 🚀"
-}
-
-# Check if script is being sourced or executed
-if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-    main "$@"
-fi 
+echo ""
+echo "🎉 Setup Complete!"
+echo ""
+echo "📋 Next Steps:"
+echo "1. Edit .cursor/mcp.json and add your API keys:"
+echo "   - ANTHROPIC_API_KEY (for Claude)"
+echo "   - GITHUB_PERSONAL_ACCESS_TOKEN"
+echo "   - Additional AI provider keys as needed"
+echo ""
+echo "2. Validate your environment:"
+echo "   ./validate-environment.sh"
+echo ""
+echo "3. Start developing Red Hat demos:"
+echo "   ./start-demo-development.sh"
+echo ""
+echo "4. Or manually navigate to demos:"
+echo "   cd product-demos"
+echo "   cursor ."
+echo ""
+echo "📚 Documentation:"
+echo "- Setup Guide: RedHat-Demo-AI-IDE/SETUP_GUIDE.md"
+echo "- Development Workflow: RedHat-Demo-AI-IDE/docs/"
+echo ""
+echo "🆘 Need help? Ask Claude in Cursor chat!"
+echo "" 

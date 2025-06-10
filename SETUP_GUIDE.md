@@ -2,25 +2,55 @@
 
 ## Overview
 
-This guide documents how to set up an AI-assisted development environment for working with [Red Hat Product Demos](https://github.com/ansible/product-demos). The environment enhances the standard Red Hat demo development workflow using Cursor IDE, Claude AI, and modern automation tools.
+This guide provides two paths for setting up an AI-enhanced Red Hat demo development environment:
 
-**Important**: This is **not** a replacement for the [official Red Hat product demos repository](https://github.com/ansible/product-demos). Instead, it provides an enhanced development environment for creating, modifying, and contributing to Red Hat demos with AI assistance.
+**🤖 Path 1: AI-Assisted Setup (Recommended)** - Let Claude do the work for you  
+**📚 Path 2: Manual Setup** - Step-by-step instructions for manual configuration
 
-## Objectives
+## 🚀 Path 1: AI-Assisted Setup (Easiest)
 
-- **Enhance Red Hat Demo Development**: Accelerate creation and modification of demos from the [rh-product-demos repository](https://github.com/ansible/product-demos)
+**For most users, this is the recommended approach.**
+
+### Quick Start Steps
+
+1. **Create your workspace:**
+   ```bash
+   mkdir my-redhat-demo-workspace
+   cd my-redhat-demo-workspace
+   cursor .
+   ```
+
+2. **Copy and paste the setup prompt from [CURSOR_SETUP_PROMPT.md](CURSOR_SETUP_PROMPT.md) into Cursor chat**
+
+3. **Let Claude set up everything automatically** - it will:
+   - Clone both repositories (this setup repo + official Red Hat demos)
+   - Install all required CLI tools for your OS
+   - Configure Cursor IDE with proper rules and MCP servers
+   - Set up the development workflow
+   - Create helper scripts
+
+4. **Complete the manual steps** Claude tells you about (mainly adding API keys)
+
+**That's it!** Skip to [Phase 6: Final Configuration](#phase-6-final-configuration) once Claude finishes.
+
+---
+
+## 📚 Path 2: Manual Setup
+
+If you prefer to understand and execute each step manually, continue with the detailed guide below.
+
+### Objectives
+
+- **Enhance Red Hat Demo Development**: Work with [Red Hat Product Demos](https://github.com/ansible/product-demos) using AI assistance
 - **AI-Assisted Coding**: Leverage Cursor IDE and Claude for intelligent code generation and review
 - **Automated Best Practices**: Ensure compliance with Red Hat coding standards through automated tooling
-- **Seamless Integration**: Maintain compatibility with existing Red Hat demo workflows and contribution processes
-- **Knowledge Transfer**: Demonstrate modern AI-assisted development practices to Red Hat teams
+- **Seamless Integration**: Maintain compatibility with existing Red Hat demo workflows
 
-## Target Audience
+### Target Audience
 
-- **Red Hat Sales Engineers** who create and modify demos from [rh-product-demos](https://github.com/ansible/product-demos)
-- **Red Hat Solutions Architects** building custom demo environments for customers
-- **Red Hat Product Teams** contributing to the official demos repository
-- **Red Hat Partners** developing demos using Red Hat technologies
-- **DevOps Teams** wanting to adopt AI-assisted development practices
+- Red Hat Sales Engineers and Solutions Architects
+- Red Hat Product Teams and Partners
+- DevOps Teams wanting AI-assisted development practices
 
 ## Prerequisites
 
@@ -468,7 +498,56 @@ EOF
 chmod +x scripts/validate-setup.sh
 ```
 
-## Phase 5: Red Hat Product Demos Integration
+## Phase 5: Final Configuration
+
+**This section applies to both AI-assisted and manual setup paths.**
+
+### Configure MCP Server API Keys
+
+Edit `.cursor/mcp.json` and add your API keys:
+
+```json
+{
+  "mcpServers": {
+    "taskmaster-ai": {
+      "env": {
+        "ANTHROPIC_API_KEY": "your-claude-api-key-here"
+      }
+    },
+    "github": {
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "your-github-token-here"  
+      }
+    }
+  }
+}
+```
+
+### Validate Your Environment
+
+```bash
+# Run the validation script (created by setup)
+./validate-environment.sh
+
+# Should show all tools installed and repositories present
+```
+
+### Start Developing
+
+```bash
+# Quick start for Red Hat demo development
+./start-demo-development.sh
+
+# Or manually navigate
+cd product-demos
+cursor .
+```
+
+---
+
+## Phase 6: Red Hat Product Demos Integration (Manual Setup Only)
+
+**Note: If you used AI-assisted setup, this is already configured.**
 
 ### Setting Up the Red Hat Demos Repository
 
