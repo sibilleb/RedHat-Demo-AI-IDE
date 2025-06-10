@@ -41,7 +41,6 @@ print_skip() {
 # Configuration flags
 FORCE_INSTALL=false
 SKIP_PROMPTS=false
-USE_VIRTUAL_ENV=false
 
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
@@ -280,55 +279,54 @@ install_python() {
                 ;;
         esac
         
-        # Check if we're in an externally-managed environment
-        if python3 -m pip install --help 2>&1 | grep -q "externally-managed-environment" || \
-           python3 -c "import sysconfig; print(sysconfig.get_path('purelib'))" 2>/dev/null | grep -q "/opt/homebrew\|/usr/local"; then
-            print_info "Detected externally-managed Python environment (Homebrew/system)"
-            print_info "Will use virtual environments and pipx for Python packages"
-            USE_VIRTUAL_ENV=true
-        else
-            # Try to upgrade pip in user space
-            python3 -m pip install --user --upgrade pip 2>/dev/null || print_warning "Could not upgrade pip"
-            USE_VIRTUAL_ENV=false
-        fi
-        
         print_success "Python environment ready"
     fi
 }
 
 # Create or activate virtual environment for Python packages
 setup_python_env() {
-    if [[ "$USE_VIRTUAL_ENV" == "true" ]]; then
-        local venv_path="$HOME/.venv/redhat-demo"
-        
-        if [[ ! -d "$venv_path" ]]; then
-            print_info "Creating virtual environment at $venv_path"
-            python3 -m venv "$venv_path"
-        fi
-        
-        # Activate virtual environment
-        source "$venv_path/bin/activate"
-        
-        # Upgrade pip in virtual environment
-        python3 -m pip install --upgrade pip
-        
-        print_info "Using virtual environment: $venv_path"
-        
-        # Add activation to shell profile
-        local shell_profile=""
-        if [[ "$SHELL" == *"zsh"* ]]; then
-            shell_profile="$HOME/.zshrc"
-        elif [[ "$SHELL" == *"bash"* ]]; then
-            shell_profile="$HOME/.bashrc"
-        fi
-        
-        if [[ -n "$shell_profile" ]] && [[ -f "$shell_profile" ]]; then
-            if ! grep -q "alias redhat-demo-env" "$shell_profile"; then
-                echo "" >> "$shell_profile"
-                echo "# Red Hat Demo Environment" >> "$shell_profile"
-                echo "alias redhat-demo-env='source $venv_path/bin/activate'" >> "$shell_profile"
-                print_info "Added 'redhat-demo-env' alias to $shell_profile"
-            fi
+    local venv_path="$HOME/.venv/redhat-demo"
+    
+    if [[ ! -d "$venv_path" ]]; then
+        print_info "Creating virtual environment at $venv_path"
+        python3 -m venv "$venv_path" || {
+            print_error "Failed to create virtual environment"
+            return 1
+        }
+    fi
+    
+    # Activate virtual environment
+    source "$venv_path/bin/activate" || {
+        print_error "Failed to activate virtual environment"
+        return 1
+    }
+    
+    # Verify activation
+    if [[ "$VIRTUAL_ENV" == "$venv_path" ]]; then
+        print_info "Successfully activated virtual environment: $venv_path"
+    else
+        print_warning "Virtual environment may not be properly activated"
+    fi
+    
+    # Upgrade pip in virtual environment
+    python3 -m pip install --upgrade pip || {
+        print_warning "Failed to upgrade pip in virtual environment"
+    }
+    
+    # Add activation to shell profile
+    local shell_profile=""
+    if [[ "$SHELL" == *"zsh"* ]]; then
+        shell_profile="$HOME/.zshrc"
+    elif [[ "$SHELL" == *"bash"* ]]; then
+        shell_profile="$HOME/.bashrc"
+    fi
+    
+    if [[ -n "$shell_profile" ]] && [[ -f "$shell_profile" ]]; then
+        if ! grep -q "alias redhat-demo-env" "$shell_profile"; then
+            echo "" >> "$shell_profile"
+            echo "# Red Hat Demo Environment" >> "$shell_profile"
+            echo "alias redhat-demo-env='source $venv_path/bin/activate'" >> "$shell_profile"
+            print_info "Added 'redhat-demo-env' alias to $shell_profile"
         fi
     fi
 }
@@ -337,12 +335,23 @@ setup_python_env() {
 install_python_packages() {
     local packages=("$@")
     
-    if [[ "$USE_VIRTUAL_ENV" == "true" ]]; then
-        # Ensure we're in the virtual environment
+    # Always check for externally-managed environment before installing packages
+    if python3 -m pip install --help 2>&1 | grep -q "externally-managed-environment" || \
+       python3 -c "import sysconfig; print(sysconfig.get_path('purelib'))" 2>/dev/null | grep -q "/opt/homebrew\|/usr/local"; then
+        print_info "Detected externally-managed Python environment - using virtual environment"
         setup_python_env
+        
+        # Verify we're in the virtual environment
+        if [[ "$VIRTUAL_ENV" != "" ]]; then
+            print_info "Installing packages in virtual environment: $VIRTUAL_ENV"
+        else
+            print_warning "Virtual environment not activated, but continuing with installation"
+        fi
+        
         python3 -m pip install "${packages[@]}"
     else
         # Use --user flag for user-space installation
+        print_info "Using --user installation for Python packages"
         python3 -m pip install --user "${packages[@]}"
     fi
 }
@@ -729,7 +738,8 @@ main() {
     print_success "Tool installation completed!"
     echo -e "${CYAN}Next steps:${NC}"
     
-    if [[ "$USE_VIRTUAL_ENV" == "true" ]]; then
+    # Check if virtual environment was created
+    if [[ -d "$HOME/.venv/redhat-demo" ]]; then
         echo -e "${CYAN}📦 Virtual Environment Information:${NC}"
         echo -e "${CYAN}   Your system uses an externally-managed Python environment.${NC}"
         echo -e "${CYAN}   All Python packages were installed in a virtual environment at:${NC}"
