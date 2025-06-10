@@ -294,8 +294,31 @@ fi
 
 # Install Python requirements
 if command -v pip3 &> /dev/null; then
-    pip3 install -r requirements.txt
-    print_success "Python requirements installed"
+    # Check for externally-managed environment
+    if python3 -c "import sysconfig; print(sysconfig.get_path('purelib'))" 2>/dev/null | grep -q "/opt/homebrew\|/usr/local"; then
+        print_info "Detected externally-managed Python environment"
+        venv_path="$HOME/.venv/redhat-demo"
+        
+        if [[ -d "$venv_path" ]]; then
+            print_info "Using existing virtual environment: $venv_path"
+            source "$venv_path/bin/activate"
+        else
+            print_info "Creating virtual environment: $venv_path"
+            python3 -m venv "$venv_path"
+            source "$venv_path/bin/activate"
+            python3 -m pip install --upgrade pip
+        fi
+        
+        pip install -r requirements.txt
+        print_success "Python requirements installed in virtual environment"
+        
+        # Add note about virtual environment
+        echo -e "${CYAN}💡 Python packages installed in virtual environment: $venv_path${NC}"
+        echo -e "${CYAN}   Activate with: source $venv_path/bin/activate${NC}"
+    else
+        pip3 install --user -r requirements.txt
+        print_success "Python requirements installed"
+    fi
 else
     print_warning "pip3 not found, skipping Python requirements installation"
 fi
@@ -305,6 +328,12 @@ cd ..
 # Step 7: Initialize pre-commit
 print_step "Setting up pre-commit hooks"
 cd "$DEMOS_REPO_NAME"
+
+# Activate virtual environment if it exists
+venv_path="$HOME/.venv/redhat-demo"
+if [[ -d "$venv_path" ]] && [[ -f "$venv_path/bin/activate" ]]; then
+    source "$venv_path/bin/activate"
+fi
 
 if command -v pre-commit &> /dev/null; then
     pre-commit install

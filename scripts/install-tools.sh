@@ -41,6 +41,7 @@ print_skip() {
 # Configuration flags
 FORCE_INSTALL=false
 SKIP_PROMPTS=false
+USE_VIRTUAL_ENV=false
 
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
@@ -265,18 +266,84 @@ install_python() {
         case $PACKAGE_MANAGER in
             brew)
                 brew install python3
+                # Install pipx for managing Python applications
+                if ! command_exists pipx; then
+                    brew install pipx
+                    pipx ensurepath
+                fi
                 ;;
             apt)
-                sudo apt install -y python3 python3-pip python3-venv
+                sudo apt install -y python3 python3-pip python3-venv python3-pipx
                 ;;
             dnf)
-                sudo dnf install -y python3 python3-pip python3-venv
+                sudo dnf install -y python3 python3-pip python3-venv pipx
                 ;;
         esac
         
-        # Upgrade pip
-        python3 -m pip install --upgrade pip
+        # Check if we're in an externally-managed environment
+        if python3 -m pip install --help 2>&1 | grep -q "externally-managed-environment" || \
+           python3 -c "import sysconfig; print(sysconfig.get_path('purelib'))" 2>/dev/null | grep -q "/opt/homebrew\|/usr/local"; then
+            print_info "Detected externally-managed Python environment (Homebrew/system)"
+            print_info "Will use virtual environments and pipx for Python packages"
+            USE_VIRTUAL_ENV=true
+        else
+            # Try to upgrade pip in user space
+            python3 -m pip install --user --upgrade pip 2>/dev/null || print_warning "Could not upgrade pip"
+            USE_VIRTUAL_ENV=false
+        fi
+        
         print_success "Python environment ready"
+    fi
+}
+
+# Create or activate virtual environment for Python packages
+setup_python_env() {
+    if [[ "$USE_VIRTUAL_ENV" == "true" ]]; then
+        local venv_path="$HOME/.venv/redhat-demo"
+        
+        if [[ ! -d "$venv_path" ]]; then
+            print_info "Creating virtual environment at $venv_path"
+            python3 -m venv "$venv_path"
+        fi
+        
+        # Activate virtual environment
+        source "$venv_path/bin/activate"
+        
+        # Upgrade pip in virtual environment
+        python3 -m pip install --upgrade pip
+        
+        print_info "Using virtual environment: $venv_path"
+        
+        # Add activation to shell profile
+        local shell_profile=""
+        if [[ "$SHELL" == *"zsh"* ]]; then
+            shell_profile="$HOME/.zshrc"
+        elif [[ "$SHELL" == *"bash"* ]]; then
+            shell_profile="$HOME/.bashrc"
+        fi
+        
+        if [[ -n "$shell_profile" ]] && [[ -f "$shell_profile" ]]; then
+            if ! grep -q "alias redhat-demo-env" "$shell_profile"; then
+                echo "" >> "$shell_profile"
+                echo "# Red Hat Demo Environment" >> "$shell_profile"
+                echo "alias redhat-demo-env='source $venv_path/bin/activate'" >> "$shell_profile"
+                print_info "Added 'redhat-demo-env' alias to $shell_profile"
+            fi
+        fi
+    fi
+}
+
+# Install Python packages safely
+install_python_packages() {
+    local packages=("$@")
+    
+    if [[ "$USE_VIRTUAL_ENV" == "true" ]]; then
+        # Ensure we're in the virtual environment
+        setup_python_env
+        python3 -m pip install "${packages[@]}"
+    else
+        # Use --user flag for user-space installation
+        python3 -m pip install --user "${packages[@]}"
     fi
 }
 
@@ -286,7 +353,7 @@ install_ansible() {
         print_section "Installing Ansible Ecosystem"
         
         # Install via pip for consistent version across platforms
-        python3 -m pip install --user ansible ansible-core ansible-lint ansible-navigator molecule molecule-plugins[docker] yamllint
+        install_python_packages ansible ansible-core ansible-lint ansible-navigator molecule "molecule-plugins[docker]" yamllint
         
         print_success "Ansible ecosystem installed"
     fi
@@ -350,7 +417,7 @@ install_terraform_tools() {
                 for tool in "${tf_tools_to_install[@]}"; do
                     case $tool in
                         "checkov")
-                            python3 -m pip install --user checkov
+                            install_python_packages checkov
                             ;;
                         *)
                             brew_tools+=("$tool")
@@ -379,7 +446,7 @@ install_terraform_tools() {
                             rm terraform-docs.tar.gz
                             ;;
                         "checkov")
-                            python3 -m pip install --user checkov
+                            install_python_packages checkov
                             ;;
                     esac
                 done
@@ -585,7 +652,7 @@ install_quality_tools() {
     fi
     
     if [[ ${#quality_tools[@]} -gt 0 ]]; then
-        python3 -m pip install --user "${quality_tools[@]}"
+        install_python_packages "${quality_tools[@]}"
         print_success "Code quality tools installed"
     fi
     
@@ -661,6 +728,19 @@ main() {
     echo ""
     print_success "Tool installation completed!"
     echo -e "${CYAN}Next steps:${NC}"
+    
+    if [[ "$USE_VIRTUAL_ENV" == "true" ]]; then
+        echo -e "${CYAN}📦 Virtual Environment Information:${NC}"
+        echo -e "${CYAN}   Your system uses an externally-managed Python environment.${NC}"
+        echo -e "${CYAN}   All Python packages were installed in a virtual environment at:${NC}"
+        echo -e "${CYAN}   ~/.venv/redhat-demo${NC}"
+        echo -e "${CYAN}   ${NC}"
+        echo -e "${CYAN}   To activate the environment in new terminals:${NC}"
+        echo -e "${CYAN}   source ~/.venv/redhat-demo/bin/activate${NC}"
+        echo -e "${CYAN}   or use the alias: redhat-demo-env${NC}"
+        echo -e "${CYAN}   ${NC}"
+    fi
+    
     echo -e "${CYAN}1. Configure your API keys in .cursor/mcp.json${NC}"
     echo -e "${CYAN}2. Run ./scripts/validate-environment.sh to verify setup${NC}"
     echo -e "${CYAN}3. Start developing with Cursor IDE${NC}"

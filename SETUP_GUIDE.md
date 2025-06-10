@@ -543,6 +543,7 @@ Your AI-enhanced Red Hat demo development environment is now configured with:
 - **"Tool already installed"**: The script automatically detects and skips already installed tools
 - **"Permission denied"**: Run `./scripts/install-tools.sh` without sudo - it will ask for permissions when needed
 - **"Python environment conflict"**: The script respects existing virtual environments and won't interfere
+- **"externally-managed-environment" error**: The script automatically detects this and uses virtual environments
 - **"Tool not found after installation"**: Restart your terminal or run `source ~/.bashrc` (Linux) or `source ~/.zshrc` (macOS)
 
 **Setup Script Issues:**

@@ -48,6 +48,7 @@ chmod +x setup.sh
 - **Smart Detection**: Tools already installed on your system are automatically skipped
 - **Your Choice**: Choose between interactive mode (ask for each tool) or install all tools
 - **Respects Your Environment**: Won't interfere with existing Python, Node.js, or other setups
+- **Virtual Environment Support**: Automatically handles externally-managed Python environments (Homebrew, system Python)
 - **Includes Cursor IDE**: Automatically installs and configures Cursor IDE for AI-assisted development
 
 **Installation modes available:**
