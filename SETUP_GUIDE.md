@@ -63,7 +63,7 @@ chmod +x setup.sh
 ./setup.sh --username YOUR_GITHUB_USERNAME
 
 # 3. Add API keys and start developing
-./start-demo-development.sh
+./scripts/start-demo-development.sh
 ```
 
 ### What the Automation Does
@@ -321,18 +321,63 @@ git remote set-url origin https://github.com/YOUR_USERNAME/product-demos.git
 #### Step 6: Configure Cursor IDE
 
 **Install Cursor IDE:**
-- Download from [https://cursor.sh/](https://cursor.sh/)
-- Install and launch the application
+1. Download from [https://cursor.sh/](https://cursor.sh/)
+2. Install and launch the application
+3. Open Settings (⌘ + ,)
+4. Search for "terminal"
+5. Enable "Allow AI to run terminal commands"
+6. Select Claude 3.5 Sonnet as your AI model
 
-**Configure workspace settings:**
-```bash
-cd RedHat-Demo-AI-IDE
+**Initial Setup Prompt:**
+```
+I want to set up my Red Hat demo development environment. I have already forked both repositories to my GitHub account.
 
-# Create symlink to shared Cursor configuration
-ln -sf "$(pwd)/.cursor" ~/.cursor-workspace
+My GitHub username is: [REPLACE-WITH-YOUR-USERNAME]
 
-# Install recommended extensions (Cursor will prompt you)
-# Extensions are defined in .cursor/extensions.json
+Please:
+
+1. Clone my forked repositories:
+   - https://github.com/[YOUR-USERNAME]/RedHat-Demo-AI-IDE  
+   - https://github.com/[YOUR-USERNAME]/product-demos
+
+2. Set up proper git remotes:
+   - origin: my forks (for pushing changes)
+   - upstream: original repos (for pulling updates)
+
+3. Create the basic directory structure and symlinks
+```
+
+**Environment Setup Prompt:**
+```
+Now I need to complete the full development environment setup. Please:
+
+1. Install all required CLI tools for my operating system:
+   - Terraform, Ansible, HashiCorp Vault
+   - AWS CLI, kubectl, Helm, OpenShift CLI (oc)  
+   - Podman, jq, yq, tree, and development tools
+   - Python packages: ansible-lint, molecule, yamllint, jinja2
+
+2. Configure Cursor IDE integration:
+   - Set up the .cursor configuration symlink
+   - Copy and configure the comprehensive MCP server template (10 servers)
+   - Install recommended Cursor extensions
+
+3. Set up development workflow tools:
+   - Pre-commit hooks for code quality
+   - Validation scripts
+   - Helper scripts for demo development
+
+My operating system is: [macOS/Linux/Windows]
+I have access to: [AWS account yes/no] [Red Hat developer account yes/no]
+```
+
+**Development Start Prompt:**
+```
+I've completed the Red Hat demo environment setup. Please:
+
+1. Create a new demo directory in the appropriate category (linux/cloud/network/etc.)
+2. Set up the standard Red Hat demo structure following official guidelines
+3. Configure the demo's automation framework with Ansible best practices
 ```
 
 #### Step 7: Set Up MCP Configuration

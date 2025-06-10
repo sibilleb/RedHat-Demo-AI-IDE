@@ -70,7 +70,7 @@ This repository provides an AI-assisted development environment for creating and
 
    My GitHub username is: [REPLACE-WITH-YOUR-USERNAME]
 
-   Please help me:
+   Please:
 
    1. Clone my forked repositories:
       - https://github.com/[YOUR-USERNAME]/RedHat-Demo-AI-IDE  
@@ -81,10 +81,6 @@ This repository provides an AI-assisted development environment for creating and
       - upstream: original repos (for pulling updates)
 
    3. Create the basic directory structure and symlinks
-
-   4. Show me what manual steps I need to complete next
-
-   Please run the necessary git clone and setup commands for me.
    ```
 
 ### Phase 3: Complete Environment Setup (AI-Assisted)
@@ -92,7 +88,7 @@ This repository provides an AI-assisted development environment for creating and
 After Phase 2 completes, paste this prompt:
 
 ```
-Now I need to complete the full development environment setup. Please reference the SETUP_GUIDE.md file in the RedHat-Demo-AI-IDE repository and help me:
+Now I need to complete the full development environment setup. Please:
 
 1. Install all required CLI tools for my operating system:
    - Terraform, Ansible, HashiCorp Vault
@@ -103,7 +99,6 @@ Now I need to complete the full development environment setup. Please reference 
 2. Configure Cursor IDE integration:
    - Set up the .cursor configuration symlink
    - Copy and configure the comprehensive MCP server template (10 servers)
-  - See [MCP_SERVERS.md](./docs/MCP_SERVERS.md) for detailed server information
    - Install recommended Cursor extensions
 
 3. Set up development workflow tools:
@@ -111,12 +106,8 @@ Now I need to complete the full development environment setup. Please reference 
    - Validation scripts
    - Helper scripts for demo development
 
-4. Guide me through the final manual configuration steps
-
 My operating system is: [macOS/Linux/Windows]
 I have access to: [AWS account yes/no] [Red Hat developer account yes/no]
-
-Please install everything automatically using my system's package manager and let me know what I need to configure manually afterward.
 ```
 
 ### Phase 4: API Key Configuration (Manual)
@@ -127,27 +118,16 @@ Please install everything automatically using my system's package manager and le
    cursor .cursor/mcp.json
    ```
 
-2. **Add your API keys:**
-   ```json
-   {
-     "mcpServers": {
-       "taskmaster-ai": {
-         "env": {
-           "ANTHROPIC_API_KEY": "your-actual-anthropic-key-here"
-         }
-       },
-       "github": {
-         "env": {
-           "GITHUB_PERSONAL_ACCESS_TOKEN": "your-github-token-here"
-         }
-       }
-     }
-   }
-   ```
+2. **Configure your API keys and credentials:**
+   - GitHub Personal Access Token (Required)
+   - AWS Access Key and Secret (Required for AWS services)
+   - Ansible Tower credentials (Optional)
+   - Terraform Cloud token (Optional)
+   - Kubernetes configuration (Optional)
 
 3. **Test your setup:**
    ```bash
-   ./validate-environment.sh
+   ./scripts/validate-environment.sh
    ```
 
 ### Phase 5: Start Developing (AI-Assisted)
@@ -159,15 +139,11 @@ cursor .
 
 **Final setup prompt:**
 ```
-I've completed the Red Hat demo environment setup. Now I want to start developing Red Hat demos with AI assistance. 
+I've completed the Red Hat demo environment setup. Please:
 
-Please:
-1. Explain the Red Hat demo repository structure
-2. Show me how to create a new demo following Red Hat best practices  
-3. Set up the development workflow for contributing back to the official repository
-4. Guide me through creating my first AI-enhanced demo
-
-I'm ready to start developing Red Hat automation demos!
+1. Create a new demo directory in the appropriate category (linux/cloud/network/etc.)
+2. Set up the standard Red Hat demo structure following official guidelines
+3. Configure the demo's automation framework with Ansible best practices
 ```
 
 ---
@@ -196,7 +172,13 @@ If you prefer manual setup without AI assistance:
 - **Containers**: OpenShift + Podman
 - **Security**: HashiCorp Vault + Red Hat Advanced Cluster Security
 - **Templating**: Jinja2 for dynamic configurations
-- **AI Tools**: Cursor IDE + Claude + 10 Essential MCP Servers (Ansible, AWS, Terraform, K8s, etc.)
+- **AI Tools**: Cursor IDE + Claude + Essential MCP Servers:
+  - Ansible Automation Platform integration
+  - AWS suite (Documentation, EKS, ECS, CDK, Cost Analysis)
+  - HashiCorp Terraform official server
+  - GitHub official server
+  - Kubernetes management
+  - Docker operations
 
 ## 🏗️ How It Works
 
@@ -240,21 +222,11 @@ my-redhat-demo-workspace/
 ## 🔧 Available Commands (After Setup)
 
 ```bash
-# Project management with TaskMaster AI
-task-master list              # View current tasks
-task-master next              # Find next task to work on
-task-master add-task          # Add new development tasks
-
 # Development workflow
 make setup                    # Initial environment setup
 make lint                     # Run all linters
-make test                     # Execute tests
-make deploy-dev              # Deploy to development environment
-
-# Red Hat demo specific
-./scripts/validate-rh-demo.sh    # Validate demo compliance
-./scripts/enhance-demo.sh         # AI-enhance existing demo
-./scripts/create-demo.sh          # Create new demo from template
+make validate                 # Run environment validation
+make test                     # Run all tests
 ```
 
 ## 🤝 Contributing to Red Hat Demos
