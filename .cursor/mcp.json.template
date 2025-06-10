@@ -1,0 +1,32 @@
+{
+    "mcpServers": {
+      "taskmaster-ai": {
+        "command": "npx",
+        "args": ["-y", "--package=task-master-ai", "task-master-ai"],
+        "env": {
+          "ANTHROPIC_API_KEY": "YOUR_ANTHROPIC_API_KEY_HERE",
+          "PERPLEXITY_API_KEY": "YOUR_PERPLEXITY_API_KEY_HERE", 
+          "OPENAI_API_KEY": "YOUR_OPENAI_API_KEY_HERE",
+          "GOOGLE_API_KEY": "YOUR_GOOGLE_API_KEY_HERE",
+          "MISTRAL_API_KEY": "YOUR_MISTRAL_API_KEY_HERE",
+          "OPENROUTER_API_KEY": "YOUR_OPENROUTER_API_KEY_HERE",
+          "XAI_API_KEY": "YOUR_XAI_API_KEY_HERE",
+          "AZURE_OPENAI_API_KEY": "YOUR_AZURE_OPENAI_API_KEY_HERE",
+          "AZURE_OPENAI_ENDPOINT": "YOUR_AZURE_OPENAI_ENDPOINT_HERE",
+          "OLLAMA_API_KEY": "YOUR_OLLAMA_API_KEY_HERE",
+          "OLLAMA_BASE_URL": "http://localhost:11434/api"
+        },
+        "enabled": true,
+        "type": "mcp"
+      },
+      "github": {
+        "command": "npx", 
+        "args": ["-y", "@modelcontextprotocol/server-github"],
+        "env": {
+          "GITHUB_PERSONAL_ACCESS_TOKEN": "YOUR_GITHUB_PERSONAL_ACCESS_TOKEN_HERE"
+        },
+        "enabled": true,
+        "type": "mcp"
+      }
+    }
+  } 

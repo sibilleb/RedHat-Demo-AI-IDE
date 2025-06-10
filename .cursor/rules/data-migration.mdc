@@ -1,0 +1,701 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Data Migration & Backward Compatibility
+
+## **Migration Architecture Patterns**
+
+- **Migration Class Structure**
+  ```typescript
+  // ✅ DO: Use consistent migration class pattern
+  export class DataMigration {
+    // Version constants for tracking
+    static readonly CURRENT_VERSION = '2.0.0';
+    static readonly SUPPORTED_VERSIONS = ['1.0.0', '1.1.0', '2.0.0'];
+    
+    // Individual migration methods
+    public migrateEntity(oldData: OldFormat): MigrationResult<NewFormat> {
+      return this.performMigration(oldData, this.transformEntity);
+    }
+    
+    // Generic migration wrapper
+    private performMigration<T, R>(
+      data: T, 
+      transformer: (data: T) => R
+    ): MigrationResult<R> {
+      try {
+        const migrated = transformer(data);
+        return {
+          success: true,
+          data: migrated,
+          changes: this.calculateChanges(data, migrated),
+          warnings: []
+        };
+      } catch (error) {
+        return {
+          success: false,
+          error: error.message,
+          changes: [],
+          warnings: []
+        };
+      }
+    }
+  }
+  ```
+
+- **Migration Result Interface**
+  ```typescript
+  // ✅ DO: Standardize migration results
+  interface MigrationResult<T> {
+    success: boolean;
+    data?: T;
+    error?: string;
+    changes: MigrationChange[];
+    warnings: string[];
+    metadata?: {
+      fromVersion?: string;
+      toVersion: string;
+      timestamp: Date;
+      migrationTime?: number;
+    };
+  }
+  
+  interface MigrationChange {
+    type: 'added' | 'removed' | 'modified' | 'deprecated';
+    field: string;
+    description: string;
+    oldValue?: any;
+    newValue?: any;
+  }
+  ```
+
+## **Field Migration Strategies**
+
+- **Array to Object Conversion**
+  ```typescript
+  // ✅ DO: Convert arrays to richer object structures
+  private migrateExperienceLevel(levels: string[]): ExperienceRequirement {
+    // Sort levels to find min and recommended
+    const sortedLevels = this.sortExperienceLevels(levels);
+    
+    return {
+      minimumLevel: sortedLevels[0],
+      recommendedLevel: this.getMedianLevel(sortedLevels),
+      rationale: this.generateRationale(sortedLevels),
+      alternativesForBeginners: this.findAlternatives(levels)
+    };
+  }
+  ```
+
+- **Deprecation Handling**
+  ```typescript
+  // ✅ DO: Keep deprecated fields during transition
+  interface MigratedManifest {
+    // New format
+    experienceRequirement: ExperienceRequirement;
+    learningResources: LearningResource[];
+    
+    // Keep old format with deprecation warning
+    /** @deprecated Use experienceRequirement instead */
+    experienceLevel?: string[];
+  }
+  ```
+
+- **Smart Default Generation**
+  ```typescript
+  // ✅ DO: Generate intelligent defaults based on existing data
+  private generateLearningResources(manifest: ToolManifest): LearningResource[] {
+    const resources: LearningResource[] = [];
+    
+    // Extract from existing documentation
+    if (manifest.documentation) {
+      if (manifest.documentation.officialDocs) {
+        resources.push({
+          title: `${manifest.name} Documentation`,
+          url: manifest.documentation.officialDocs,
+          type: 'documentation',
+          experienceLevel: 'intermediate'
+        });
+      }
+      
+      if (manifest.documentation.quickStart) {
+        resources.push({
+          title: 'Getting Started Guide',
+          url: manifest.documentation.quickStart,
+          type: 'tutorial',
+          experienceLevel: 'beginner'
+        });
+      }
+    }
+    
+    return resources;
+  }
+  ```
+
+## **Validation Integration**
+
+- **Post-Migration Validation**
+  ```typescript
+  // ✅ DO: Validate after migration
+  public migrateWithValidation<T>(
+    data: any, 
+    migrator: (data: any) => T,
+    validator: (data: T) => ValidationResult
+  ): MigrationResult<T> {
+    const migrationResult = this.performMigration(data, migrator);
+    
+    if (migrationResult.success && migrationResult.data) {
+      const validation = validator(migrationResult.data);
+      
+      if (!validation.isValid) {
+        return {
+          ...migrationResult,
+          success: false,
+          error: 'Migration produced invalid data',
+          warnings: [...migrationResult.warnings, ...validation.warnings]
+        };
+      }
+      
+      // Add validation warnings to migration result
+      migrationResult.warnings.push(...validation.warnings);
+    }
+    
+    return migrationResult;
+  }
+  ```
+
+## **Backward Compatibility Rules**
+
+- **Preserve Original Data**
+  ```typescript
+  // ✅ DO: Always preserve original fields during migration
+  const migratedData = {
+    ...originalData,  // Keep all original fields
+    ...newFields,     // Add new fields
+    _migrationMetadata: {
+      version: '2.0.0',
+      migratedAt: new Date(),
+      preservedFields: Object.keys(originalData)
+    }
+  };
+  ```
+
+- **Gradual Deprecation**
+  ```typescript
+  // ✅ DO: Warn about deprecated fields
+  interface DeprecationWarning {
+    field: string;
+    reason: string;
+    alternative: string;
+    removalVersion?: string;
+  }
+  
+  private checkDeprecatedFields(data: any): DeprecationWarning[] {
+    const warnings: DeprecationWarning[] = [];
+    
+    if (data.experienceLevel) {
+      warnings.push({
+        field: 'experienceLevel',
+        reason: 'Array format is deprecated',
+        alternative: 'Use experienceRequirement object instead',
+        removalVersion: '3.0.0'
+      });
+    }
+    
+    return warnings;
+  }
+  ```
+
+## **Complexity Analysis for Migration**
+
+- **Analyze Data Complexity**
+  ```typescript
+  // ✅ DO: Generate complexity indicators from existing data
+  private generateDifficultyIndicators(manifest: ToolManifest): string[] {
+    const indicators: string[] = [];
+    
+    // Check configuration complexity
+    if (manifest.configuration && Object.keys(manifest.configuration).length > 10) {
+      indicators.push('Complex configuration with many options');
+    }
+    
+    // Check dependency count
+    if (manifest.dependencies && manifest.dependencies.length > 5) {
+      indicators.push('Multiple required dependencies');
+    }
+    
+    // Check known complex tools
+    const complexTools = ['kubernetes', 'docker', 'webpack', 'terraform'];
+    if (complexTools.includes(manifest.id.toLowerCase())) {
+      indicators.push('Known to have steep learning curve');
+    }
+    
+    // Category-specific complexity
+    const categoryComplexity = {
+      'security': ['Requires understanding of security principles'],
+      'database': ['Requires database administration knowledge'],
+      'devops': ['Requires infrastructure knowledge']
+    };
+    
+    if (manifest.category && categoryComplexity[manifest.category]) {
+      indicators.push(...categoryComplexity[manifest.category]);
+    }
+    
+    return indicators;
+  }
+  ```
+
+## **Testing Migration Logic**
+
+- **Comprehensive Migration Tests**
+  ```typescript
+  // ✅ DO: Test all migration scenarios
+  describe('DataMigration', () => {
+    describe('Tool Migration', () => {
+      it('should migrate simple tool manifests', () => {
+        const oldManifest = createOldFormatManifest();
+        const result = migration.migrateToolManifest(oldManifest);
+        
+        expect(result.success).toBe(true);
+        expect(result.data?.experienceRequirement).toBeDefined();
+        expect(result.changes).toContainEqual({
+          type: 'added',
+          field: 'experienceRequirement',
+          description: 'Converted experienceLevel array to object format'
+        });
+      });
+      
+      it('should handle edge cases gracefully', () => {
+        const edgeCaseManifest = {
+          experienceLevel: [], // Empty array
+          documentation: null   // Null documentation
+        };
+        
+        const result = migration.migrateToolManifest(edgeCaseManifest);
+        expect(result.success).toBe(true);
+        // Should handle gracefully without crashing
+      });
+      
+      it('should preserve all original fields', () => {
+        const original = createComplexManifest();
+        const result = migration.migrateToolManifest(original);
+        
+        // Check that all original fields are preserved
+        Object.keys(original).forEach(key => {
+          expect(result.data).toHaveProperty(key);
+        });
+      });
+    });
+    
+    describe('Validation Integration', () => {
+      it('should validate migrated data', () => {
+        const result = migration.migrateWithValidation(
+          oldData,
+          migration.migrateToolManifest,
+          validator.validateToolManifest
+        );
+        
+        expect(result.success).toBe(true);
+        // If validation fails, migration should report failure
+      });
+    });
+  });
+  ```
+
+- **Change Tracking Tests**
+  ```typescript
+  // ✅ DO: Verify change tracking accuracy
+  it('should track all changes made during migration', () => {
+    const result = migration.migrateToolManifest(oldManifest);
+    
+    expect(result.changes).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          type: 'added',
+          field: 'experienceRequirement'
+        }),
+        expect.objectContaining({
+          type: 'deprecated',
+          field: 'experienceLevel'
+        })
+      ])
+    );
+  });
+  ```
+
+## **Error Handling & Recovery**
+
+- **Safe Migration Execution**
+  ```typescript
+  // ✅ DO: Provide rollback information
+  public safeMigrate<T>(data: any): SafeMigrationResult<T> {
+    const originalData = structuredClone(data); // Deep copy for rollback
+    
+    try {
+      const result = this.migrate(data);
+      
+      return {
+        ...result,
+        rollbackData: originalData,
+        canRollback: true
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message,
+        rollbackData: originalData,
+        canRollback: true,
+        changes: [],
+        warnings: []
+      };
+    }
+  }
+  ```
+
+- **Partial Migration Support**
+  ```typescript
+  // ✅ DO: Support partial migrations for large datasets
+  public migrateBatch<T>(
+    items: any[], 
+    batchSize: number = 100
+  ): BatchMigrationResult<T> {
+    const results: MigrationResult<T>[] = [];
+    const failed: Array<{ index: number; item: any; error: string }> = [];
+    
+    for (let i = 0; i < items.length; i += batchSize) {
+      const batch = items.slice(i, i + batchSize);
+      
+      batch.forEach((item, batchIndex) => {
+        try {
+          const result = this.migrate(item);
+          results.push(result);
+        } catch (error) {
+          failed.push({
+            index: i + batchIndex,
+            item,
+            error: error.message
+          });
+        }
+      });
+    }
+    
+    return {
+      successful: results.filter(r => r.success),
+      failed,
+      totalProcessed: items.length
+    };
+  }
+  ```
+
+## **Documentation Requirements**
+
+- **Migration Guide**: Each migration must have a comprehensive guide (see [manifest-migration-guide.md](mdc:docs/manifest-migration-guide.md))
+- **Change Log**: Document all breaking changes and migration steps
+- **Rollback Procedures**: Provide clear rollback instructions
+- **Version Compatibility**: Document supported version ranges
+
+## **Performance Considerations**
+
+- **Lazy Migration**
+  ```typescript
+  // ✅ DO: Support on-demand migration for large datasets
+  public createMigrationProxy<T>(data: any): T {
+    return new Proxy(data, {
+      get(target, prop) {
+        if (prop === 'experienceRequirement' && !target[prop]) {
+          // Migrate on first access
+          target[prop] = migration.migrateExperienceLevel(target.experienceLevel);
+        }
+        return target[prop];
+      }
+    });
+  }
+  ```
+
+- **Caching Migration Results**
+  ```typescript
+  // ✅ DO: Cache expensive migration operations
+  private migrationCache = new Map<string, any>();
+  
+  public getCachedMigration(key: string, migrator: () => any): any {
+    if (!this.migrationCache.has(key)) {
+      this.migrationCache.set(key, migrator());
+    }
+    return this.migrationCache.get(key);
+  }
+  ```
+
+## **Version Management**
+
+- **Semantic Versioning for Data**
+  ```typescript
+  // ✅ DO: Use semantic versioning for data format changes
+  interface DataVersion {
+    major: number; // Breaking changes
+    minor: number; // New fields, backward compatible
+    patch: number; // Bug fixes, no schema changes
+  }
+  
+  // ✅ DO: Provide version detection
+  public detectVersion(data: any): DataVersion {
+    // Analyze data structure to determine version
+    if (data.experienceRequirement) return { major: 2, minor: 0, patch: 0 };
+    if (data.experienceLevel) return { major: 1, minor: 0, patch: 0 };
+    throw new Error('Unknown data format version');
+  }
+  ```
+
+## **Experience to Job Role Migration Patterns**
+
+- **Experience Level to Job Role Mapping**
+  ```typescript
+  // ✅ DO: Provide clear mapping strategy from experience levels to job roles
+  interface ExperienceToRoleMigration {
+    // Migration methods for transitioning from experience levels to job roles
+    migrateUserPreferences(oldPrefs: { experienceLevel: 'beginner' | 'intermediate' | 'advanced' }): {
+      jobRolePreferences: JobRoleProfile;
+      confidenceScore: number;
+    };
+  }
+  
+  // Example implementation
+  private mapExperienceLevelToRoles(experienceLevel: string): JobRole[] {
+    // Map experience levels to potential job roles with configurable fallbacks
+    switch (experienceLevel) {
+      case 'beginner':
+        return ['frontend-developer', 'backend-developer']; // Common entry points
+      case 'intermediate':
+        // More specific roles for intermediate developers
+        return ['frontend-developer', 'backend-developer', 'fullstack-developer', 'devops-engineer'];
+      case 'advanced':
+        // Full range of roles for advanced developers
+        return ['frontend-developer', 'backend-developer', 'fullstack-developer', 'devops-engineer', 'cloud-architect', 'security-engineer'];
+      default:
+        return ['frontend-developer', 'backend-developer']; // Safe defaults
+    }
+  }
+  ```
+
+- **Tool Recommendation Migration**
+  ```typescript
+  // ✅ DO: Migrate tool recommendations from experience-based to role-based
+  public migrateToolRecommendations(
+    experienceBasedRecommendations: Map<string, string[]>
+  ): RoleBasedRecommendation {
+    const roleRecommendations: Record<JobRole, string[]> = {};
+    
+    // For each experience level, map tools to appropriate roles
+    if (experienceBasedRecommendations.has('beginner')) {
+      const beginnerTools = experienceBasedRecommendations.get('beginner') || [];
+      // Assign beginner-friendly tools to common entry-level roles
+      roleRecommendations['frontend-developer'] = [...beginnerTools];
+      roleRecommendations['backend-developer'] = [...beginnerTools];
+    }
+    
+    if (experienceBasedRecommendations.has('intermediate')) {
+      const intermediateTools = experienceBasedRecommendations.get('intermediate') || [];
+      // Distribute intermediate tools to appropriate roles
+      roleRecommendations['frontend-developer'] = [
+        ...(roleRecommendations['frontend-developer'] || []),
+        ...intermediateTools.filter(tool => this.isFrontendTool(tool))
+      ];
+      
+      roleRecommendations['backend-developer'] = [
+        ...(roleRecommendations['backend-developer'] || []),
+        ...intermediateTools.filter(tool => this.isBackendTool(tool))
+      ];
+      
+      roleRecommendations['fullstack-developer'] = [
+        ...(roleRecommendations['fullstack-developer'] || []),
+        ...intermediateTools
+      ];
+    }
+    
+    if (experienceBasedRecommendations.has('advanced')) {
+      const advancedTools = experienceBasedRecommendations.get('advanced') || [];
+      // Map specialized advanced tools to specific roles
+      roleRecommendations['devops-engineer'] = [
+        ...(roleRecommendations['devops-engineer'] || []),
+        ...advancedTools.filter(tool => this.isDevOpsTool(tool))
+      ];
+      
+      roleRecommendations['security-engineer'] = [
+        ...(roleRecommendations['security-engineer'] || []),
+        ...advancedTools.filter(tool => this.isSecurityTool(tool))
+      ];
+    }
+    
+    return {
+      roleRecommendations,
+      migrationMetadata: {
+        strategy: 'experience-to-role',
+        mappingQuality: 'estimated',
+        source: 'experience-levels'
+      }
+    };
+  }
+  ```
+
+- **User Settings Migration**
+  ```typescript
+  // ✅ DO: Migrate user preferences from experience level to job roles
+  public migrateUserSettings(settings: LegacyUserSettings): UserSettings {
+    // Create new role-based settings
+    const newSettings: UserSettings = {
+      ...settings, // Keep other settings
+      jobRoleProfile: this.createInitialRoleProfile(settings.experienceLevel),
+      // Mark old field as deprecated but keep it for backward compatibility
+      /** @deprecated Use jobRoleProfile instead */
+      experienceLevel: settings.experienceLevel
+    };
+    
+    return newSettings;
+  }
+  
+  private createInitialRoleProfile(experienceLevel?: 'beginner' | 'intermediate' | 'advanced'): JobRoleProfile {
+    // Start with reasonable defaults based on experience level
+    const confidenceScore = experienceLevel === 'beginner' ? 0.4 : 
+                          experienceLevel === 'intermediate' ? 0.6 : 0.8;
+    
+    // Default to frontend for beginners, full-stack for others if no clear signal
+    const primaryRole = experienceLevel === 'beginner' ? 'frontend-developer' : 'fullstack-developer';
+    
+    return {
+      primaryRole,
+      secondaryRoles: this.mapExperienceLevelToRoles(experienceLevel || 'beginner'),
+      confidenceScore,
+      questionnaireTaken: false, // Indicate that detailed role questionnaire hasn't been taken yet
+      shouldPromptForQuestionnaire: true // Prompt to take role questionnaire
+    };
+  }
+  ```
+
+- **Database Migration Scripts**
+  ```typescript
+  // ✅ DO: Include database migration scripts for experience to role transition
+  export async function migrateUserDatabase(db: Database): Promise<MigrationReport> {
+    const results: MigrationReport = {
+      total: 0,
+      successful: 0,
+      failed: [],
+      warnings: []
+    };
+    
+    // Get all users with experience level setting
+    const users = await db.users.find({ experienceLevel: { $exists: true } }).toArray();
+    results.total = users.length;
+    
+    for (const user of users) {
+      try {
+        // Create job role profile
+        const jobRoleProfile = createInitialRoleProfile(user.experienceLevel);
+        
+        // Update user record
+        await db.users.updateOne(
+          { _id: user._id },
+          { 
+            $set: { jobRoleProfile },
+            // Keep experienceLevel for backward compatibility
+          }
+        );
+        
+        results.successful++;
+      } catch (error) {
+        results.failed.push({
+          id: user._id,
+          error: error.message
+        });
+      }
+    }
+    
+    return results;
+  }
+  ```
+
+## **Role Configuration Migration**
+
+- **Experience-Based to Role-Based Tool Config**
+  ```typescript
+  // ✅ DO: Migrate tool configurations from experience-based to role-based
+  interface ToolConfigMigration {
+    migrateToolConfig(config: LegacyToolConfig): RoleBasedToolConfig;
+  }
+  
+  function migrateToolConfig(config: LegacyToolConfig): RoleBasedToolConfig {
+    const roleBasedConfig: RoleBasedToolConfig = {
+      id: config.id,
+      name: config.name,
+      description: config.description,
+      roleRecommendations: {}
+    };
+    
+    // Map experience levels to relevant roles
+    if (config.experienceLevels?.includes('beginner')) {
+      roleBasedConfig.roleRecommendations['frontend-developer'] = {
+        priority: 'recommended',
+        rationale: 'Good tool for frontend development beginners'
+      };
+      roleBasedConfig.roleRecommendations['backend-developer'] = {
+        priority: 'recommended',
+        rationale: 'Good tool for backend development beginners'
+      };
+    }
+    
+    if (config.experienceLevels?.includes('intermediate')) {
+      // Add role-specific recommendations for intermediate users
+      if (config.categories?.includes('frontend')) {
+        roleBasedConfig.roleRecommendations['frontend-developer'] = {
+          priority: 'essential',
+          rationale: 'Essential for frontend development workflows'
+        };
+      }
+      
+      if (config.categories?.includes('backend')) {
+        roleBasedConfig.roleRecommendations['backend-developer'] = {
+          priority: 'essential',
+          rationale: 'Essential for backend development workflows'
+        };
+      }
+    }
+    
+    if (config.experienceLevels?.includes('advanced')) {
+      // Add specialized role recommendations for advanced tools
+      if (config.categories?.includes('devops')) {
+        roleBasedConfig.roleRecommendations['devops-engineer'] = {
+          priority: 'essential',
+          rationale: 'Core tool for DevOps workflows'
+        };
+      }
+      
+      if (config.categories?.includes('security')) {
+        roleBasedConfig.roleRecommendations['security-engineer'] = {
+          priority: 'essential',
+          rationale: 'Critical for security engineering tasks'
+        };
+      }
+    }
+    
+    return roleBasedConfig;
+  }
+  ```
+
+- **Progressive Rollout Strategy**
+  ```typescript
+  // ✅ DO: Implement gradual transition from experience to role-based system
+  interface MigrationStrategy {
+    phaseOne(): void;   // Dual system (both experience and role)
+    phaseTwo(): void;   // Role primary, experience fallback
+    phaseThree(): void; // Role-only system
+  }
+  
+  // Example implementation for phase one
+  function phaseOneMigration() {
+    // 1. Keep experience level system fully functional
+    // 2. Add job role system in parallel
+    // 3. When no role data exists, generate from experience level
+    // 4. Introduce role questionnaire but make it optional
+    // 5. Start collecting role data for future phases
+  }
+  ```

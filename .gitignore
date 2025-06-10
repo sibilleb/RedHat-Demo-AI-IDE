@@ -1,0 +1,240 @@
+# Red Hat Demo Development Environment - .gitignore
+
+# ===== OS and Editor Files =====
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# VSCode / Cursor IDE
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# ===== Environment and Secrets =====
+.env
+.env.local
+.env.*.local
+.secrets/
+secrets/
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.cer
+*.der
+
+# AWS credentials (if accidentally placed here)
+.aws/credentials
+.aws/config
+
+# ===== Ansible Specific =====
+*.retry
+.vault_pass
+vault_pass
+vault-password
+ansible.log
+.ansible/
+ansible.cfg.bak
+
+# Ansible Galaxy
+collections/ansible_collections/
+galaxy.yml.bak
+
+# ===== Terraform =====
+# Local .terraform directories
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+*.tfvars
+*.tfvars.json
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
+
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+.venv/
+
+# ===== Node.js (for any tooling) =====
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# ===== Container and Virtualization =====
+.vagrant/
+Vagrantfile.local
+
+# Docker
+.dockerignore.bak
+
+# ===== Logs and Temporary Files =====
+logs/
+*.log
+tmp/
+temp/
+.tmp/
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# ===== Red Hat Specific =====
+# Subscription Manager
+/etc/rhsm/
+rhsm.conf
+
+# Satellite certificates
+katello-ca-consumer-*.rpm
+
+# Demo environment artifacts
+demo-artifacts/
+test-results/
+.molecule/
+molecule/*/molecule.yml.bak
+
+# ===== Testing and CI/CD =====
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+
+# JUnit test results
+TEST-*.xml
+test-reports/
+
+# ===== IDE and Development Tools =====
+.idea/
+*.iml
+*.ipr
+*.iws
+.project
+.settings/
+.classpath
+
+# Sublime Text
+*.sublime-workspace
+*.sublime-project
+
+# Vim
+*.swp
+*.swo
+.netrwhist
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# ===== Local Development Workspace =====
+# Don't commit the actual demo workspace
+redhat-demo-workspace/
+workspace/
+local-demos/
+
+# Local configuration overrides
+config.local.*
+settings.local.*
+local.yml
+local.yaml
+
+# ===== Backup and Archive Files =====
+*.bak
+*.backup
+*.old
+*.orig
+*.save
+*.tar.gz
+*.zip
+*.rar
+
+# ===== TaskMaster Integration =====
+# Keep TaskMaster config but ignore generated files
+.taskmaster/logs/
+.taskmaster/cache/
+.taskmaster/tmp/
+# Keep: .taskmaster/config.json, .taskmaster/tasks/, etc.
+
+# ===== MCP Integration =====
+# Exclude MCP configuration with secrets
+.cursor/mcp.json
+# Keep template/example versions
+!.cursor/mcp.json.example
+!.cursor/mcp.json.template
+
+# ===== Project Specific =====
+# Ignore any local testing artifacts
+test-workspace/
+local-testing/
+sandbox/
+
+# Local documentation builds
+docs/_build/
+docs/site/
+
+# Keep important files (explicit includes)
+!README.md
+!SETUP_GUIDE.md
+!LICENSE
+!CHANGELOG.md
+!.cursor/
+!.pre-commit-config.yaml
+!scripts/
+!config/
+!docs/
+!examples/ 
