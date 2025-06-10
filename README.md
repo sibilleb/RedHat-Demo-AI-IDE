@@ -19,16 +19,27 @@ This repository provides an AI-assisted development environment for creating and
    ```
    I want to set up an AI-enhanced Red Hat demo development environment. Please:
 
-   1. Clone the setup repository: https://github.com/sibilleb/RedHat-Demo-AI-IDE
-   2. Clone the official Red Hat demos: https://github.com/ansible/product-demos  
-   3. Set up the directory structure for AI-enhanced development
-   4. Install required CLI tools (terraform, ansible, vault, aws-cli, oc, helm, podman)
-   5. Configure Cursor with the proper rules and MCP servers
-   6. Create a sample MCP configuration template
-   7. Set up the integration between this enhanced environment and the Red Hat demos
-   8. Provide me with next steps to start developing demos with AI assistance
+   1. Help me fork these repositories on GitHub (I'll do this manually):
+      - Fork https://github.com/sibilleb/RedHat-Demo-AI-IDE to my account
+      - Fork https://github.com/ansible/product-demos to my account
+   
+   2. Clone MY FORKED versions (replace YOUR-USERNAME with my GitHub username):
+      - Clone https://github.com/YOUR-USERNAME/RedHat-Demo-AI-IDE
+      - Clone https://github.com/YOUR-USERNAME/product-demos
+   
+   3. Set up proper git remotes:
+      - origin: points to my forks (for pushing changes)
+      - upstream: points to official repos (for pulling updates)
+   
+   4. Set up the directory structure for AI-enhanced development
+   5. Install required CLI tools (terraform, ansible, vault, aws-cli, oc, helm, podman)
+   6. Configure Cursor with the proper rules and MCP servers
+   7. Create a sample MCP configuration template
+   8. Set up the integration between this enhanced environment and the Red Hat demos
+   9. Provide me with next steps to start developing demos with AI assistance
 
    My operating system is: [macOS/Linux/Windows]
+   My GitHub username is: [YOUR-USERNAME]
    I have access to: [AWS account yes/no] [Red Hat developer account yes/no]
    ```
 
@@ -36,7 +47,21 @@ This repository provides an AI-assisted development environment for creating and
 
 ### Option 2: Manual Setup
 
-If you prefer manual setup, follow the detailed [Setup Guide](SETUP_GUIDE.md).
+1. **Fork both repositories on GitHub:**
+   - Fork https://github.com/sibilleb/RedHat-Demo-AI-IDE to your account
+   - Fork https://github.com/ansible/product-demos to your account
+
+2. **Clone your forked repositories:**
+   ```bash
+   # Replace YOUR-USERNAME with your GitHub username
+   git clone https://github.com/YOUR-USERNAME/RedHat-Demo-AI-IDE.git
+   cd RedHat-Demo-AI-IDE
+   
+   # Set up upstream remote for pulling updates
+   git remote add upstream https://github.com/sibilleb/RedHat-Demo-AI-IDE.git
+   ```
+
+3. **Follow the detailed [Setup Guide](SETUP_GUIDE.md)** for manual installation steps.
 
 ## 🎯 What This Environment Provides
 
@@ -132,7 +157,7 @@ make deploy-dev              # Deploy to development environment
 ### Example: Enhancing an Existing Demo
 
 ```bash
-# Navigate to demos and open in Cursor
+# Navigate to YOUR FORKED demos and open in Cursor
 cd product-demos/linux/existing-demo
 cursor .
 
@@ -142,10 +167,46 @@ cursor .
 # Validate changes
 ../../RedHat-Demo-AI-IDE/scripts/validate-rh-demo.sh
 
-# Submit PR with enhancements
+# Create branch and commit to YOUR FORK
 git checkout -b enhance/existing-demo
+git add .
 git commit -m "AI-enhanced demo with improved practices"
 git push origin enhance/existing-demo
+
+# Create PR from YOUR FORK to the OFFICIAL repository
+# GitHub will prompt you to create a PR from your fork to ansible/product-demos
+```
+
+### Proper Git Workflow for Red Hat Demos
+
+```bash
+# 1. Make sure you're working with your fork
+cd product-demos
+git remote -v
+# Should show:
+# origin    https://github.com/YOUR-USERNAME/product-demos.git (your fork)
+# upstream  https://github.com/ansible/product-demos.git (official)
+
+# 2. Always pull latest changes from upstream before starting work
+git fetch upstream
+git checkout main
+git merge upstream/main
+git push origin main  # Update your fork
+
+# 3. Create feature branch for your work
+git checkout -b feature/my-awesome-demo
+
+# 4. Develop with AI assistance in Cursor
+# ... make changes ...
+
+# 5. Push to YOUR FORK (origin)
+git add .
+git commit -m "Add awesome new demo with AI enhancements"
+git push origin feature/my-awesome-demo
+
+# 6. Create PR on GitHub from your fork to official repository
+# Visit: https://github.com/ansible/product-demos
+# GitHub will show a banner to create PR from your recently pushed branch
 ```
 
 ## 📚 Documentation

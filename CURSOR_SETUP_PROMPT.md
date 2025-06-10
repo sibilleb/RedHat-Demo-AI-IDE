@@ -9,11 +9,21 @@ Copy and paste this prompt into Cursor chat after creating your workspace direct
 ```
 I want to set up an AI-enhanced Red Hat demo development environment using the GitHub repository: https://github.com/sibilleb/RedHat-Demo-AI-IDE
 
+**IMPORTANT**: I need to work with FORKED versions of repositories, not the originals, for proper contribution workflow.
+
 Please help me:
 
-1. **Clone the necessary repositories:**
-   - Clone https://github.com/sibilleb/RedHat-Demo-AI-IDE (the setup repo)
-   - Clone https://github.com/ansible/product-demos (official Red Hat demos)
+1. **First, guide me through forking repositories on GitHub** (I'll do this step manually):
+   - Fork https://github.com/sibilleb/RedHat-Demo-AI-IDE to my account
+   - Fork https://github.com/ansible/product-demos to my account
+
+2. **Clone MY FORKED repositories** (replace YOUR-USERNAME with my actual GitHub username):
+   - Clone https://github.com/YOUR-USERNAME/RedHat-Demo-AI-IDE (the setup repo)
+   - Clone https://github.com/YOUR-USERNAME/product-demos (my forked Red Hat demos)
+
+3. **Set up proper git remotes for contribution workflow:**
+   - origin: points to my forks (where I push changes)
+   - upstream: points to original repos (where I pull updates)
 
 2. **Install required CLI tools for my operating system:**
    - Terraform, Ansible, HashiCorp Vault
@@ -46,8 +56,16 @@ Please help me:
 
 **My system information:**
 - Operating system: [macOS/Linux/Windows - please specify]
+- GitHub username: [YOUR-USERNAME - replace with actual username]
 - I have access to: [AWS account yes/no] [Red Hat developer account yes/no] [GitHub account yes/no]
 - Preferred package manager: [homebrew/apt/other - will be auto-detected]
+
+**IMPORTANT WORKFLOW NOTE**: 
+When I develop demos, I will:
+- Work in my forked repositories only
+- Push changes to my forks (origin remote)
+- Create pull requests from my forks to official repositories
+- Never push directly to the official Red Hat repositories
 
 Please execute the setup step by step and let me know what manual steps I need to complete afterward.
 ```

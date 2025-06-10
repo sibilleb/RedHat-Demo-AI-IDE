@@ -93,19 +93,69 @@ fi
 
 # Clone repositories if not already present
 echo "📥 Setting up repositories..."
+echo ""
+echo "⚠️  IMPORTANT: For proper contribution workflow, you should work with FORKED repositories!"
+echo "   This script will guide you through the process."
+echo ""
 
-if [ ! -d "RedHat-Demo-AI-IDE" ]; then
-    echo "Cloning RedHat-Demo-AI-IDE repository..."
-    git clone https://github.com/sibilleb/RedHat-Demo-AI-IDE.git
-else
-    echo "RedHat-Demo-AI-IDE repository already exists"
+# Get GitHub username for forked repositories
+if [ -z "$GITHUB_USERNAME" ]; then
+    echo "🔑 GitHub Username Required:"
+    echo "   To properly contribute to Red Hat demos, you need forked repositories."
+    echo "   You should have already forked:"
+    echo "   - https://github.com/sibilleb/RedHat-Demo-AI-IDE"
+    echo "   - https://github.com/ansible/product-demos"
+    echo ""
+    read -p "Enter your GitHub username (for forked repositories): " GITHUB_USERNAME
+    
+    if [ -z "$GITHUB_USERNAME" ]; then
+        echo "❌ GitHub username is required for proper setup. Exiting."
+        echo "   Please fork the repositories first, then run this script again."
+        exit 1
+    fi
 fi
 
-if [ ! -d "product-demos" ]; then
-    echo "Cloning Red Hat Product Demos repository..."
-    git clone https://github.com/ansible/product-demos.git
+# Clone setup repository (forked version)
+if [ ! -d "RedHat-Demo-AI-IDE" ]; then
+    echo "📥 Cloning your forked RedHat-Demo-AI-IDE repository..."
+    if git clone https://github.com/${GITHUB_USERNAME}/RedHat-Demo-AI-IDE.git; then
+        cd RedHat-Demo-AI-IDE
+        git remote add upstream https://github.com/sibilleb/RedHat-Demo-AI-IDE.git
+        echo "✅ Remotes configured for RedHat-Demo-AI-IDE:"
+        echo "   origin: https://github.com/${GITHUB_USERNAME}/RedHat-Demo-AI-IDE.git (your fork)"
+        echo "   upstream: https://github.com/sibilleb/RedHat-Demo-AI-IDE.git (original)"
+        cd ..
+    else
+        echo "❌ Failed to clone your fork. Please ensure you have forked the repository."
+        echo "   Fork: https://github.com/sibilleb/RedHat-Demo-AI-IDE"
+        exit 1
+    fi
 else
-    echo "product-demos repository already exists"
+    echo "✅ RedHat-Demo-AI-IDE repository already exists"
+fi
+
+# Clone Red Hat Product Demos repository (forked version)
+if [ ! -d "product-demos" ]; then
+    echo "📥 Cloning your forked Red Hat Product Demos repository..."
+    if git clone https://github.com/${GITHUB_USERNAME}/product-demos.git; then
+        cd product-demos
+        git remote add upstream https://github.com/ansible/product-demos.git
+        echo "✅ Remotes configured for product-demos:"
+        echo "   origin: https://github.com/${GITHUB_USERNAME}/product-demos.git (your fork)"
+        echo "   upstream: https://github.com/ansible/product-demos.git (official Red Hat)"
+        cd ..
+    else
+        echo "❌ Failed to clone your fork. Please ensure you have forked the repository."
+        echo "   Fork: https://github.com/ansible/product-demos"
+        exit 1
+    fi
+else
+    echo "✅ product-demos repository already exists"
+    echo "⚠️  Checking remote configuration..."
+    cd product-demos
+    echo "Current remotes:"
+    git remote -v
+    cd ..
 fi
 
 # Set up symlinks for Cursor configuration
