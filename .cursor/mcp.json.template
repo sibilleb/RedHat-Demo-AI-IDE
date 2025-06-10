@@ -1,29 +1,107 @@
 {
     "mcpServers": {
-      "taskmaster-ai": {
-        "command": "npx",
-        "args": ["-y", "--package=task-master-ai", "task-master-ai"],
-        "env": {
-          "ANTHROPIC_API_KEY": "YOUR_ANTHROPIC_API_KEY_HERE",
-          "PERPLEXITY_API_KEY": "YOUR_PERPLEXITY_API_KEY_HERE", 
-          "OPENAI_API_KEY": "YOUR_OPENAI_API_KEY_HERE",
-          "GOOGLE_API_KEY": "YOUR_GOOGLE_API_KEY_HERE",
-          "MISTRAL_API_KEY": "YOUR_MISTRAL_API_KEY_HERE",
-          "OPENROUTER_API_KEY": "YOUR_OPENROUTER_API_KEY_HERE",
-          "XAI_API_KEY": "YOUR_XAI_API_KEY_HERE",
-          "AZURE_OPENAI_API_KEY": "YOUR_AZURE_OPENAI_API_KEY_HERE",
-          "AZURE_OPENAI_ENDPOINT": "YOUR_AZURE_OPENAI_ENDPOINT_HERE",
-          "OLLAMA_API_KEY": "YOUR_OLLAMA_API_KEY_HERE",
-          "OLLAMA_BASE_URL": "http://localhost:11434/api"
-        },
-        "enabled": true,
-        "type": "mcp"
-      },
       "github": {
         "command": "npx", 
         "args": ["-y", "@modelcontextprotocol/server-github"],
         "env": {
           "GITHUB_PERSONAL_ACCESS_TOKEN": "YOUR_GITHUB_PERSONAL_ACCESS_TOKEN_HERE"
+        },
+        "enabled": true,
+        "type": "mcp"
+      },
+      "ansible-automation-platform": {
+        "command": "npx",
+        "args": ["-y", "@rlopez133/mcp-ansible-automation-platform"],
+        "env": {
+          "ANSIBLE_TOWER_HOST": "YOUR_ANSIBLE_TOWER_HOST_HERE",
+          "ANSIBLE_TOWER_USERNAME": "YOUR_ANSIBLE_TOWER_USERNAME_HERE",
+          "ANSIBLE_TOWER_PASSWORD": "YOUR_ANSIBLE_TOWER_PASSWORD_HERE",
+          "ANSIBLE_TOWER_TOKEN": "YOUR_ANSIBLE_TOWER_TOKEN_HERE"
+        },
+        "enabled": true,
+        "type": "mcp"
+      },
+      "aws-documentation": {
+        "command": "npx",
+        "args": ["-y", "@awslabs/mcp-aws-documentation"],
+        "env": {
+          "AWS_ACCESS_KEY_ID": "YOUR_AWS_ACCESS_KEY_ID_HERE",
+          "AWS_SECRET_ACCESS_KEY": "YOUR_AWS_SECRET_ACCESS_KEY_HERE",
+          "AWS_DEFAULT_REGION": "us-east-1"
+        },
+        "enabled": true,
+        "type": "mcp"
+      },
+      "aws-eks": {
+        "command": "npx",
+        "args": ["-y", "@awslabs/mcp-aws-eks"],
+        "env": {
+          "AWS_ACCESS_KEY_ID": "YOUR_AWS_ACCESS_KEY_ID_HERE",
+          "AWS_SECRET_ACCESS_KEY": "YOUR_AWS_SECRET_ACCESS_KEY_HERE",
+          "AWS_DEFAULT_REGION": "us-east-1"
+        },
+        "enabled": true,
+        "type": "mcp"
+      },
+      "aws-ecs": {
+        "command": "npx",
+        "args": ["-y", "@awslabs/mcp-aws-ecs"],
+        "env": {
+          "AWS_ACCESS_KEY_ID": "YOUR_AWS_ACCESS_KEY_ID_HERE",
+          "AWS_SECRET_ACCESS_KEY": "YOUR_AWS_SECRET_ACCESS_KEY_HERE",
+          "AWS_DEFAULT_REGION": "us-east-1"
+        },
+        "enabled": true,
+        "type": "mcp"
+      },
+      "aws-cdk": {
+        "command": "npx",
+        "args": ["-y", "@awslabs/mcp-aws-cdk"],
+        "env": {
+          "AWS_ACCESS_KEY_ID": "YOUR_AWS_ACCESS_KEY_ID_HERE",
+          "AWS_SECRET_ACCESS_KEY": "YOUR_AWS_SECRET_ACCESS_KEY_HERE",
+          "AWS_DEFAULT_REGION": "us-east-1"
+        },
+        "enabled": true,
+        "type": "mcp"
+      },
+      "aws-cost-analysis": {
+        "command": "npx",
+        "args": ["-y", "@awslabs/mcp-aws-cost-analysis"],
+        "env": {
+          "AWS_ACCESS_KEY_ID": "YOUR_AWS_ACCESS_KEY_ID_HERE",
+          "AWS_SECRET_ACCESS_KEY": "YOUR_AWS_SECRET_ACCESS_KEY_HERE",
+          "AWS_DEFAULT_REGION": "us-east-1"
+        },
+        "enabled": true,
+        "type": "mcp"
+      },
+      "terraform": {
+        "command": "npx",
+        "args": ["-y", "@hashicorp/terraform-mcp-server"],
+        "env": {
+          "TERRAFORM_CLOUD_TOKEN": "YOUR_TERRAFORM_CLOUD_TOKEN_HERE",
+          "TF_VAR_aws_access_key": "YOUR_AWS_ACCESS_KEY_ID_HERE",
+          "TF_VAR_aws_secret_key": "YOUR_AWS_SECRET_ACCESS_KEY_HERE"
+        },
+        "enabled": true,
+        "type": "mcp"
+      },
+      "kubernetes": {
+        "command": "npx",
+        "args": ["-y", "@flux159/mcp-server-kubernetes"],
+        "env": {
+          "KUBECONFIG": "YOUR_KUBECONFIG_PATH_HERE",
+          "KUBERNETES_NAMESPACE": "default"
+        },
+        "enabled": true,
+        "type": "mcp"
+      },
+      "docker": {
+        "command": "npx",
+        "args": ["-y", "@docker/mcp-docker"],
+        "env": {
+          "DOCKER_HOST": "unix:///var/run/docker.sock"
         },
         "enabled": true,
         "type": "mcp"

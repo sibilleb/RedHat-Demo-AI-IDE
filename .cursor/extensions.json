@@ -1,0 +1,130 @@
+{
+  "recommendations": [
+    // Core Red Hat Development
+    "redhat.ansible",
+    "redhat.vscode-commons", 
+    "redhat.vscode-yaml",
+    "redhat.vscode-openshift-connector",
+    "redhat.java",
+    
+    // Infrastructure as Code
+    "hashicorp.terraform",
+    "hashicorp.hcl",
+    "hashicorp.vault",
+    
+    // Cloud & Containers
+    "ms-vscode.vscode-docker",
+    "ms-kubernetes-tools.vscode-kubernetes-tools",
+    "ms-azuretools.vscode-azureterraform",
+    "amazonwebservices.aws-toolkit-vscode",
+    
+    // Languages & Frameworks
+    "ms-python.python",
+    "ms-python.pylint", 
+    "ms-python.black-formatter",
+    "ms-python.isort",
+    "ms-python.flake8",
+    "samuelcolvin.jinjahtml",
+    "wholroyd.jinja",
+    
+    // Go Development (for Kubernetes/operators)
+    "golang.go",
+    "golang.go-nightly",
+    
+    // Git & Version Control
+    "eamodio.gitlens",
+    "github.vscode-pull-request-github",
+    "github.copilot",
+    "github.copilot-chat",
+    
+    // Code Quality & Security
+    "timonwong.shellcheck",
+    "exiasr.hadolint",
+    "ms-vscode.vscode-json",
+    "redhat.vscode-xml",
+    "ms-vscode.makefile-tools",
+    
+    // Formatters & Prettifiers (Enhanced Section)
+    "esbenp.prettier-vscode",                    // General formatter (JS/TS/CSS/HTML/JSON/Markdown)
+    "foxundermoon.shell-format",                 // Shell script formatter (bash/zsh)
+    "shakram02.bash-beautify",                   // Advanced bash formatting
+    "redhat.vscode-yaml",                        // YAML formatter and validator
+    "bungcip.better-toml",                       // TOML formatter
+    "tamasfe.even-better-toml",                  // Enhanced TOML support
+    "pascalreitermann93.vscode-yaml-sort",       // YAML key sorting
+    "ms-vscode.vscode-json",                     // JSON formatter
+    "redhat.vscode-xml",                         // XML formatter
+    "mohsen1.prettify-json",                     // Advanced JSON prettifying
+    "ms-vscode.makefile-tools",                  // Makefile formatting
+    "mikestead.dotenv",                          // .env file formatting
+    "timonwong.ansible-autocomplete",            // Ansible formatting support
+    
+    // Documentation & Markdown
+    "yzhang.markdown-all-in-one",
+    "davidanson.vscode-markdownlint",
+    "streetsidesoftware.code-spell-checker",
+    "bierner.jsdoc-markdown-highlighting",
+    "bierner.markdown-mermaid",                  // Mermaid diagram support
+    "shd101wyy.markdown-preview-enhanced",       // Enhanced markdown preview
+    
+    // Productivity & Formatting
+    "editorconfig.editorconfig",                 // EditorConfig support
+    "ms-vscode.vscode-typescript-next",
+    "bradlc.vscode-tailwindcss",
+    "formulahendry.auto-close-tag",              // Auto close HTML/XML tags
+    "formulahendry.auto-rename-tag",             // Auto rename paired tags
+    "coenraads.bracket-pair-colorizer-2",        // Bracket pair colorizing
+    "ms-vscode.vscode-css-peek",                 // CSS formatting support
+    
+    // Advanced Code Formatting
+    "rubbersheep.table-formatter",               // Table formatting (Markdown, CSV)
+    "stkb.rewrap",                               // Text wrapping and reformatting
+    "alefragnani.bookmarks",                     // Code bookmarks
+    "ms-vscode.wordcount",                       // Word count for documentation
+    
+    // Testing & Debugging
+    "ms-vscode.test-adapter-converter",
+    "hbenl.vscode-test-explorer",
+    "littlefoxteam.vscode-python-test-adapter",
+    
+    // Data & Configuration
+    "redhat.vscode-yaml",
+    "ms-vscode.vscode-json",
+    "tamasfe.even-better-toml",
+    "mechatroner.rainbow-csv",
+    "janisdd.vscode-edit-csv",                   // CSV editor and formatter
+    
+    // Terminal & Shell
+    "ms-vscode.vscode-terminal-tabs",
+    "formulahendry.terminal",
+    
+    // Red Hat Specific Tools
+    "redhat.fabric8-analytics",
+    "redhat.vscode-knative",
+    
+    // Additional Productivity
+    "gruntfuggly.todo-tree",
+    "aaron-bond.better-comments",
+    "oderwat.indent-rainbow",
+    "christian-kohler.path-intellisense",
+    "visualstudioexptteam.vscodeintellicode",
+    
+    // Advanced Formatting & Linting
+    "emeraldwalk.runonsave",                     // Run formatters on save
+    "tyriar.sort-lines",                         // Sort lines utility
+    "sleistner.vscode-fileutils",                // File utilities
+    "ms-vscode.vscode-eslint",                   // ESLint for any JS/TS
+    
+    // Theme & UI (Optional but recommended)
+    "github.github-vscode-theme",
+    "pkief.material-icon-theme",
+    "equinusocio.vsc-material-theme"
+  ],
+  "unwantedRecommendations": [
+    // Remove conflicting or unnecessary extensions
+    "ms-python.python-preview",
+    "ms-vscode.vscode-typescript",
+    "hookyqr.beautify",
+    "ms-python.autopep8"  // Conflicts with black-formatter
+  ]
+} 

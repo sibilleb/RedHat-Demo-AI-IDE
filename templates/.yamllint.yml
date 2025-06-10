@@ -1,0 +1,127 @@
+# YAML Lint Configuration for Red Hat Demo Development
+# Optimized for Ansible, Kubernetes, and infrastructure YAML files
+
+extends: default
+
+rules:
+  # Braces - allow single line braces for Jinja2
+  braces:
+    min-spaces-inside: 0
+    max-spaces-inside: 1
+    min-spaces-inside-empty: -1
+    max-spaces-inside-empty: -1
+
+  # Brackets - common in Ansible 
+  brackets:
+    min-spaces-inside: 0
+    max-spaces-inside: 0
+    min-spaces-inside-empty: -1
+    max-spaces-inside-empty: -1
+
+  # Colons - Ansible style
+  colons:
+    max-spaces-before: 0
+    min-spaces-after: 1
+    max-spaces-after: 1
+
+  # Commas
+  commas:
+    max-spaces-before: 0
+    min-spaces-after: 1
+    max-spaces-after: 1
+
+  # Comments - allow for inline Ansible comments
+  comments:
+    min-spaces-from-content: 2
+
+  # Document start - flexible for multi-doc YAML
+  document-start:
+    present: false
+
+  # Empty lines
+  empty-lines:
+    max: 2
+    max-start: 0
+    max-end: 1
+
+  # Empty values - common in Ansible variables
+  empty-values:
+    forbid-in-block-mappings: false
+    forbid-in-flow-mappings: false
+
+  # Hyphens
+  hyphens:
+    max-spaces-after: 1
+
+  # Indentation - 2 spaces for Ansible/K8s
+  indentation:
+    spaces: 2
+    indent-sequences: true
+    check-multi-line-strings: false
+
+  # Key duplicates
+  key-duplicates: enable
+
+  # Key ordering - not enforced for flexibility
+  key-ordering: disable
+
+  # Line length - generous for Ansible tasks
+  line-length:
+    max: 160
+    allow-non-breakable-words: true
+    allow-non-breakable-inline-mappings: true
+
+  # New line at end of file
+  new-line-at-end-of-file: enable
+
+  # Octal values
+  octal-values:
+    forbid-implicit-octal: true
+    forbid-explicit-octal: true
+
+  # Quoted strings - flexible for Ansible
+  quoted-strings:
+    quote-type: any
+    required: false
+
+  # Trailing spaces
+  trailing-spaces: enable
+
+  # Truthy values - important for Ansible booleans
+  truthy:
+    allowed-values: ['true', 'false', 'yes', 'no', 'on', 'off']
+    check-keys: false
+
+# Ignore specific patterns common in Red Hat environments
+ignore: |
+  .tox/
+  .cache/
+  .terraform/
+  node_modules/
+  venv/
+  .venv/
+  __pycache__/
+  .pytest_cache/
+  .git/
+  *.egg-info/
+  .mypy_cache/
+  .coverage
+  htmlcov/
+  dist/
+  build/
+  site-packages/
+  .ansible/
+  collections/
+  # Molecule testing
+  molecule/*/converge.yml
+  molecule/*/molecule.yml
+  # GitHub Actions (has special syntax)
+  .github/workflows/
+  # Helm charts (have special templating)
+  charts/*/templates/
+  templates/
+  # Ansible collections may have different standards  
+  ansible_collections/
+  # Generated files
+  *.retry
+  *.log 

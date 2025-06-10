@@ -1,809 +1,491 @@
-# Red Hat Demo Development Environment Setup Guide
+# Red Hat Demo AI-Enhanced Development Environment Setup Guide
 
 ## Overview
 
-This guide provides two paths for setting up an AI-enhanced Red Hat demo development environment:
+This guide provides **two paths** for setting up an AI-enhanced Red Hat demo development environment featuring Ansible Automation Platform, Terraform, HashiCorp Vault, OpenShift, and Event Driven Ansible integration:
 
-**🤖 Path 1: AI-Assisted Setup (Recommended)** - Let Claude do the work for you  
-**📚 Path 2: Manual Setup** - Step-by-step instructions for manual configuration
+- **🚀 One-Click Automated Setup**: 3 commands, 5 minutes (Recommended)
+- **📖 Manual Setup**: Detailed step-by-step instructions for learning and customization
 
-## 🚀 Path 1: AI-Assisted Setup (Easiest)
+## ⚠️ **IMPORTANT: Complete Prerequisites Checklist**
 
-**For most users, this is the recommended approach.**
+**Before starting any setup**, you **MUST** prepare the following credentials and accounts. The setup will fail without these:
 
-### Quick Start Steps
+### 🔑 **Required API Keys & Tokens**
 
-1. **Create your workspace:**
-   ```bash
-   mkdir my-redhat-demo-workspace
-   cd my-redhat-demo-workspace
-   cursor .
-   ```
+| **Service** | **Required** | **How to Get** | **Purpose** |
+|-------------|-------------|----------------|-------------|
+| **GitHub Personal Access Token** | ✅ **MANDATORY** | [GitHub > Settings > Developer settings > Personal access tokens](https://github.com/settings/tokens) | Repository access, forking, cloning |
+| **AWS Access Key ID + Secret** | ✅ **MANDATORY** | [AWS Console > IAM > Users > Security credentials](https://console.aws.amazon.com/iam/) | All AWS MCP servers, Terraform, infrastructure |
+| **Anthropic API Key** | ⚠️ **Recommended** | [Anthropic Console](https://console.anthropic.com/) | Claude AI integration in Cursor |
+| **GitHub Username** | ✅ **MANDATORY** | Your GitHub username | Repository forking and configuration |
 
-2. **Copy and paste the setup prompt from [CURSOR_SETUP_PROMPT.md](CURSOR_SETUP_PROMPT.md) into Cursor chat**
+### 🏢 **Optional Enterprise Credentials** 
 
-3. **Let Claude set up everything automatically** - it will:
-   - Clone both repositories (this setup repo + official Red Hat demos)
-   - Install all required CLI tools for your OS
-   - Configure Cursor IDE with proper rules and MCP servers
-   - Set up the development workflow
-   - Create helper scripts
+| **Service** | **Required** | **How to Get** | **Purpose** |
+|-------------|-------------|----------------|-------------|
+| **Ansible Tower/AWX Host** | 🔧 Optional | Your organization's AAP instance | Ansible Automation Platform integration |
+| **Ansible Tower Username/Password** | 🔧 Optional | Your AAP credentials | AAP authentication |
+| **Terraform Cloud Token** | 🔧 Optional | [Terraform Cloud](https://app.terraform.io/app/settings/tokens) | Terraform Cloud integration |
+| **Kubeconfig Path** | 🔧 Optional | Your Kubernetes cluster config | Kubernetes MCP server |
 
-4. **Complete the manual steps** Claude tells you about (mainly adding API keys)
+### 💻 **System Requirements**
 
-**That's it!** Skip to [Phase 6: Final Configuration](#phase-6-final-configuration) once Claude finishes.
+- **OS**: macOS, Linux, or Windows WSL2
+- **RAM**: 16GB minimum (32GB recommended)
+- **Storage**: 50GB available space
+- **Network**: Stable internet connection
+
+### 🏗️ **Account Access Required**
+
+- **GitHub Account** with ability to fork repositories
+- **AWS Account** with administrative permissions
+- **Red Hat Developer Account** (for registry access)
+- **Cursor IDE License** (free tier available)
 
 ---
 
-## 📚 Path 2: Manual Setup
+## 🚀 Option 1: One-Click Automated Setup (Recommended)
 
-If you prefer to understand and execute each step manually, continue with the detailed guide below.
+**Perfect for**: Getting started quickly, production use, teams wanting consistency
 
-### Objectives
+### Quick Start (3 Commands)
 
-- **Enhance Red Hat Demo Development**: Work with [Red Hat Product Demos](https://github.com/ansible/product-demos) using AI assistance
-- **AI-Assisted Coding**: Leverage Cursor IDE and Claude for intelligent code generation and review
-- **Automated Best Practices**: Ensure compliance with Red Hat coding standards through automated tooling
-- **Seamless Integration**: Maintain compatibility with existing Red Hat demo workflows
+**⚠️ WARNING: Have your GitHub username and API keys ready before starting!**
+
+```bash
+# 1. Create workspace and get setup script
+mkdir my-redhat-demo-workspace && cd my-redhat-demo-workspace
+curl -sSL https://raw.githubusercontent.com/sibilleb/RedHat-Demo-AI-IDE/main/scripts/one-click-setup.sh -o setup.sh
+
+# 2. Run automated setup (replace YOUR_GITHUB_USERNAME)
+chmod +x setup.sh
+./setup.sh --username YOUR_GITHUB_USERNAME
+
+# 3. Add API keys and start developing
+./start-demo-development.sh
+```
+
+### What the Automation Does
+
+The one-click setup automatically:
+
+1. **Creates workspace structure**
+2. **Forks and clones repositories** with proper git remotes
+3. **Installs all CLI tools** (Terraform, Ansible, AWS CLI, Kubernetes tools, etc.)
+4. **Configures Cursor IDE** with extensions and settings
+5. **Sets up pre-commit hooks** and development tools
+6. **Creates helper scripts** for common tasks
+7. **Prepares comprehensive MCP configuration** with 10 essential servers:
+   - Ansible Automation Platform integration
+   - AWS Labs suite (Documentation, EKS, ECS, CDK, Cost Analysis)  
+   - HashiCorp Terraform official server
+   - GitHub official server
+   - Kubernetes management server
+   - Docker operations server
+8. **Validates the environment** and reports any issues
+
+⏭️ **After automation completes**: Skip to [Final Configuration](#final-configuration) section.
+
+---
+
+## 📖 Option 2: Manual Setup (Educational)
+
+**Perfect for**: Learning the process, custom environments, troubleshooting, understanding each step
 
 ### Target Audience
-
 - Red Hat Sales Engineers and Solutions Architects
 - Red Hat Product Teams and Partners
 - DevOps Teams wanting AI-assisted development practices
 
-## Prerequisites
+### Manual Setup Steps
 
-### System Requirements
-- macOS, Linux, or Windows with WSL2
-- Minimum 16GB RAM (32GB recommended)
-- 50GB available disk space
-- Internet connection for downloading tools and dependencies
+#### Step 1: Install Core Development Tools
 
-### Access Requirements
-- **Red Hat Demo Access**: Access to [demo.redhat.com](https://demo.redhat.com) (for Red Hat Associates and Partners)
-- **GitHub Access**: Permission to fork and contribute to [rh-product-demos](https://github.com/ansible/product-demos)
-- **Red Hat Developer Account**: For accessing Red Hat registries and Automation Hub
-- **AWS Account**: Administrative privileges for cloud infrastructure provisioning
-- **HashiCorp Cloud Platform**: Optional, for Vault Cloud integration
-
-### Development Tools
-- Git (latest version)
-- Docker Desktop or Podman
-- Terminal/shell access (zsh/bash recommended)
-- Cursor IDE or VS Code
-
-## Phase 1: Core CLI Tools Installation
-
-### Essential Infrastructure Tools
-
+**Git and Basic Tools:**
 ```bash
-# Package managers (choose based on your OS)
-# macOS (Homebrew)
+# Verify Git is installed (required for all workflows)
+git --version
+
+# macOS: Install Homebrew if not present
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
-# Linux (Ubuntu/Debian)
+# Linux (Ubuntu/Debian): Update package manager
 sudo apt update && sudo apt upgrade -y
 
-# Install core infrastructure tools
-# Terraform
-brew install terraform
-# OR for Linux:
-# wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
-# echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
-# sudo apt update && sudo apt install terraform
-
-# Ansible (latest)
-pip3 install ansible ansible-core
-# OR
-brew install ansible
-
-# HashiCorp Vault
-brew install vault
-# OR for Linux: use the same HashiCorp repository as Terraform
-
-# AWS CLI v2
-curl "https://awscli.amazonaws.com/AWSCLIV2.pkg" -o "AWSCLIV2.pkg" && sudo installer -pkg AWSCLIV2.pkg -target /
-# OR for Linux:
-# curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-# unzip awscliv2.zip && sudo ./aws/install
-
-# Kubernetes tools
-brew install kubernetes-cli helm
-# OR for Linux:
-# curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-# chmod +x kubectl && sudo mv kubectl /usr/local/bin/
+# Basic utilities
+# macOS:
+brew install curl wget jq yq tree watch htop
+# Linux:
+sudo apt install curl wget jq tree watch htop -y
+pip3 install yq
 ```
 
-### Red Hat and OpenShift Tools
-
+**Python Environment:**
 ```bash
-# OpenShift CLI
-brew install openshift-cli
-# OR download from: https://console.redhat.com/openshift/downloads
+# Install Python 3.9+ and pip
+# macOS:
+brew install python
+# Linux:
+sudo apt install python3 python3-pip python3-venv -y
 
+# Create virtual environment (recommended)
+python3 -m venv ~/.venv/redhat-demo
+source ~/.venv/redhat-demo/bin/activate
+
+# Add to your shell profile (.bashrc, .zshrc):
+echo 'alias demo-env="source ~/.venv/redhat-demo/bin/activate"' >> ~/.zshrc
+```
+
+#### Step 2: Install Infrastructure Tools
+
+**Terraform:**
+```bash
+# macOS:
+brew install terraform
+
+# Linux:
+wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+sudo apt update && sudo apt install terraform
+```
+
+**Ansible Ecosystem:**
+```bash
+# Install Ansible core and automation platform tools
+pip3 install ansible ansible-core ansible-navigator ansible-runner
+
+# Install Ansible ecosystem tools
+pip3 install ansible-lint molecule molecule-plugins[docker] yamllint
+
+# Install collections (do this in your project directory later)
+ansible-galaxy collection install ansible.posix community.general community.crypto
+```
+
+**HashiCorp Vault:**
+```bash
+# macOS:
+brew install vault
+
+# Linux: (uses same HashiCorp repository as Terraform)
+sudo apt install vault
+```
+
+**AWS CLI:**
+```bash
+# macOS:
+brew install awscli
+
+# Linux:
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip && sudo ./aws/install
+rm -rf awscliv2.zip aws/
+```
+
+#### Step 3: Install Container and Kubernetes Tools
+
+**Container Tools:**
+```bash
 # Podman (Red Hat's container engine)
+# macOS:
 brew install podman
-# OR for Linux:
-# sudo apt install podman
-
-# Initialize Podman machine (macOS/Windows)
 podman machine init
 podman machine start
+
+# Linux:
+sudo apt install podman -y
+
+# Docker (alternative)
+# Download Docker Desktop from: https://www.docker.com/products/docker-desktop/
 ```
 
-### Development Ecosystem Tools
-
+**Kubernetes Tools:**
 ```bash
-# Terraform ecosystem
+# kubectl and Helm
+# macOS:
+brew install kubectl helm
+
+# Linux:
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+chmod +x kubectl && sudo mv kubectl /usr/local/bin/
+
+# Helm
+curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+```
+
+**OpenShift CLI:**
+```bash
+# macOS:
+brew install openshift-cli
+
+# Linux:
+# Download from: https://console.redhat.com/openshift/downloads
+# Or use the mirror:
+curl -LO https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable/openshift-client-linux.tar.gz
+tar -xzf openshift-client-linux.tar.gz
+chmod +x oc kubectl && sudo mv oc kubectl /usr/local/bin/
+```
+
+#### Step 4: Install Development and Quality Tools
+
+**Terraform Ecosystem:**
+```bash
+# macOS:
 brew install tflint terragrunt terraform-docs checkov
-# OR for Linux, install individually:
-# curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
-# curl -L https://github.com/gruntwork-io/terragrunt/releases/download/v0.50.0/terragrunt_linux_amd64 -o terragrunt
-# chmod +x terragrunt && sudo mv terragrunt /usr/local/bin/
 
-# Ansible ecosystem
-pip3 install ansible-lint molecule molecule-plugins[docker] yamllint
-pip3 install ansible-navigator ansible-runner
+# Linux:
+# TFLint
+curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
 
-# Template engines and Python tools
-pip3 install jinja2 jinja2-cli j2cli
-pip3 install cookiecutter  # For project templating
+# Terragrunt
+curl -L https://github.com/gruntwork-io/terragrunt/releases/latest/download/terragrunt_linux_amd64 -o terragrunt
+chmod +x terragrunt && sudo mv terragrunt /usr/local/bin/
 
-# Security and validation tools
+# Terraform-docs
+curl -sSLo ./terraform-docs.tar.gz https://terraform-docs.io/dl/v0.16.0/terraform-docs-v0.16.0-$(uname)-amd64.tar.gz
+tar -xzf terraform-docs.tar.gz
+chmod +x terraform-docs && sudo mv terraform-docs /usr/local/bin/
+
+# Checkov
+pip3 install checkov
+```
+
+**Code Quality Tools:**
+```bash
+# Pre-commit framework
 pip3 install pre-commit
+
+# Linting tools
+# macOS:
 brew install hadolint shellcheck
-# OR for Linux:
-# sudo apt install shellcheck
-# wget https://github.com/hadolint/hadolint/releases/latest/download/hadolint-Linux-x86_64 -O hadolint
-# chmod +x hadolint && sudo mv hadolint /usr/local/bin/
+# Linux:
+sudo apt install shellcheck -y
+wget https://github.com/hadolint/hadolint/releases/latest/download/hadolint-Linux-x86_64 -O hadolint
+chmod +x hadolint && sudo mv hadolint /usr/local/bin/
 
-# Utilities
-brew install jq yq tree watch htop
-# OR for Linux:
-# sudo apt install jq tree watch htop
-# pip3 install yq
+# Python tools
+pip3 install black isort flake8 pylint bandit safety
+```
 
-### Jinja2 Integration for Red Hat Ecosystem
-
-Jinja2 is a critical component for the Red Hat demo environment, providing powerful templating capabilities:
-
+**Template and Documentation Tools:**
 ```bash
-# Install Jinja2 ecosystem (if not already installed above)
+# Jinja2 templating (critical for Ansible)
 pip3 install jinja2 jinja2-cli j2cli
 
-# Additional templating tools for complex scenarios
-pip3 install cookiecutter  # Project template generation
-pip3 install ansible-templating-tools  # Extended Ansible templating utilities
+# Project templating
+pip3 install cookiecutter
 
-# Verify Jinja2 installation
-python3 -c "import jinja2; print(f'Jinja2 {jinja2.__version__} installed successfully')"
-
-# Test CLI templating
-echo "Environment: {{ env | default('development') }}" | j2 -D env=production
+# Node.js for MCP servers and additional tooling
+# macOS:
+brew install node
+# Linux:
+curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
+sudo apt-get install -y nodejs
 ```
 
-**Why Jinja2 is Essential for This Environment:**
-- **Ansible Templates**: Dynamic configuration files, inventory generation, and playbook customization
-- **Terraform Integration**: Variable templating and dynamic resource configuration
-- **Event Driven Ansible**: Dynamic rulebook generation based on environment conditions
-- **OpenShift/Kubernetes**: YAML manifest templating for different environments
-- **Documentation**: Dynamic documentation generation with environment-specific details
+#### Step 5: Create Workspace and Fork Repositories
 
-**Common Use Cases in Red Hat Ecosystem:**
-- Generating environment-specific Ansible inventories
-- Creating dynamic Kubernetes/OpenShift manifests
-- Templating Terraform variable files
-- Building configuration files for different deployment targets
-- Automating documentation updates
+**Create your development workspace:**
+```bash
+# Create a dedicated workspace directory
+mkdir my-redhat-demo-workspace
+cd my-redhat-demo-workspace
 ```
 
-### Container and Virtualization Tools
+**Fork the repositories:**
+1. Go to [https://github.com/sibilleb/RedHat-Demo-AI-IDE](https://github.com/sibilleb/RedHat-Demo-AI-IDE)
+2. Click **Fork** to create your copy
+3. Go to [https://github.com/ansible/product-demos](https://github.com/ansible/product-demos)  
+4. Click **Fork** to create your copy
+
+**Clone your forks:**
+```bash
+# Clone the setup repository (replace YOUR_USERNAME)
+git clone https://github.com/YOUR_USERNAME/RedHat-Demo-AI-IDE.git
+cd RedHat-Demo-AI-IDE
+
+# Set up git remotes
+git remote add upstream https://github.com/sibilleb/RedHat-Demo-AI-IDE.git
+git remote set-url origin https://github.com/YOUR_USERNAME/RedHat-Demo-AI-IDE.git
+
+# Clone the demos repository  
+cd ..
+git clone https://github.com/YOUR_USERNAME/product-demos.git
+cd product-demos
+
+# Set up git remotes
+git remote add upstream https://github.com/ansible/product-demos.git
+git remote set-url origin https://github.com/YOUR_USERNAME/product-demos.git
+```
+
+#### Step 6: Configure Cursor IDE
+
+**Install Cursor IDE:**
+- Download from [https://cursor.sh/](https://cursor.sh/)
+- Install and launch the application
+
+**Configure workspace settings:**
+```bash
+cd RedHat-Demo-AI-IDE
+
+# Create symlink to shared Cursor configuration
+ln -sf "$(pwd)/.cursor" ~/.cursor-workspace
+
+# Install recommended extensions (Cursor will prompt you)
+# Extensions are defined in .cursor/extensions.json
+```
+
+#### Step 7: Set Up MCP Configuration
+
+**Configure MCP for AI Integration:**
+
+> 📖 **For detailed information about all 10 MCP servers**, see [MCP_SERVERS.md](./docs/MCP_SERVERS.md)
 
 ```bash
-# Docker Desktop (alternative to Podman)
-# Download from: https://www.docker.com/products/docker-desktop/
+# Copy MCP template to active configuration
+cp .cursor/mcp.json.template .cursor/mcp.json
 
-# Vagrant (for local testing environments)
-brew install vagrant
-# OR download from: https://www.vagrantup.com/downloads
-
-# VirtualBox (Vagrant provider)
-brew install --cask virtualbox
-# OR download from: https://www.virtualbox.org/wiki/Downloads
+# Edit the configuration with your API keys
+# This is where you'll add all the credentials from the prerequisites checklist
+nano .cursor/mcp.json
 ```
 
-## Phase 2: Cursor IDE Configuration
+**⚠️ REQUIRED: Add your API keys to `.cursor/mcp.json`:**
 
-### Required Extensions
+Replace these placeholders with your actual credentials:
+- `YOUR_GITHUB_PERSONAL_ACCESS_TOKEN_HERE`
+- `YOUR_AWS_ACCESS_KEY_ID_HERE` 
+- `YOUR_AWS_SECRET_ACCESS_KEY_HERE`
+- `YOUR_ANSIBLE_TOWER_HOST_HERE` (if using AAP)
+- `YOUR_ANSIBLE_TOWER_USERNAME_HERE` (if using AAP)
+- `YOUR_ANSIBLE_TOWER_PASSWORD_HERE` (if using AAP)
+- `YOUR_TERRAFORM_CLOUD_TOKEN_HERE` (if using Terraform Cloud)
+- `YOUR_KUBECONFIG_PATH_HERE` (if using Kubernetes)
 
-Install the following extensions in Cursor IDE:
+#### Step 8: Set Up Development Environment
 
-```json
-{
-  "recommendations": [
-    "HashiCorp.terraform",
-    "redhat.ansible",
-    "redhat.vscode-commons",
-    "redhat.vscode-yaml",
-    "ms-vscode.vscode-json",
-    "eamodio.gitlens",
-    "ms-vscode.vscode-docker",
-    "ms-kubernetes-tools.vscode-kubernetes-tools",
-    "redhat.vscode-openshift-connector",
-    "esbenp.prettier-vscode",
-    "streetsidesoftware.code-spell-checker",
-    "yzhang.markdown-all-in-one",
-    "ms-python.python",
-    "ms-python.pylint",
-    "timonwong.shellcheck"
-  ]
-}
-```
-
-### MCP Server Configuration
-
-Update your `.cursor/mcp.json` configuration:
-
-```json
-{
-  "mcpServers": {
-    "taskmaster-ai": {
-      "command": "npx",
-      "args": ["-y", "task-master-ai", "mcp"],
-      "env": {
-        "ANTHROPIC_API_KEY": "your-anthropic-key",
-        "PERPLEXITY_API_KEY": "your-perplexity-key"
-      }
-    },
-    "github": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-github"],
-      "env": {
-        "GITHUB_PERSONAL_ACCESS_TOKEN": "your-github-token"
-      }
-    },
-    "filesystem": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-filesystem", "/path/to/your/project"]
-    },
-    "kubernetes": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-kubernetes"]
-    }
-  }
-}
-```
-
-### Cursor Rules Setup
-
-Ensure you have comprehensive cursor rules for:
-- Ansible best practices (including Jinja2 templating)
-- Terraform standards
-- AWS CLI usage
-- Kubernetes/OpenShift patterns
-- Docker/container practices
-- Security guidelines
-- Python development (for custom modules and plugins)
-
-### MCP (Model Context Protocol) Configuration
-
-Configure the MCP servers for enhanced AI capabilities:
-
-1. **Copy the MCP template:**
-   ```bash
-   cp .cursor/mcp.json.template .cursor/mcp.json
-   ```
-
-2. **Add your API keys to `.cursor/mcp.json`:**
-   - `ANTHROPIC_API_KEY`: For Claude AI integration
-   - `OPENAI_API_KEY`: For OpenAI models (if using)
-   - `PERPLEXITY_API_KEY`: For research capabilities
-   - `GITHUB_PERSONAL_ACCESS_TOKEN`: For GitHub integration
-   - Additional keys as needed for your preferred AI providers
-
-3. **Verify MCP configuration:**
-   - The `.cursor/mcp.json` file is ignored by git (contains secrets)
-   - The template file `.cursor/mcp.json.template` is committed for reference
-   - TaskMaster AI and GitHub MCP servers will be available in Cursor
-
-## Phase 3: Project Structure Setup
-
-### Directory Structure Creation
-
+**Configure Python environment:**
 ```bash
-# Create the main project structure
-mkdir -p ansible-dev-ide/{ansible,terraform,eda,vault,openshift,docs,tests,.github}
+# Create project-specific virtual environment
+python3 -m venv venv
+source venv/bin/activate
 
-# Ansible structure
-mkdir -p ansible-dev-ide/ansible/{inventories,playbooks,roles,collections,group_vars,host_vars}
-mkdir -p ansible-dev-ide/ansible/inventories/{production,staging,development}
-
-# Terraform structure  
-mkdir -p ansible-dev-ide/terraform/{environments,modules,shared}
-mkdir -p ansible-dev-ide/terraform/environments/{dev,staging,prod}
-mkdir -p ansible-dev-ide/terraform/modules/{networking,compute,storage,security}
-
-# EDA structure
-mkdir -p ansible-dev-ide/eda/{rulebooks,decision-environments,execution-environments,plugins}
-
-# Vault structure
-mkdir -p ansible-dev-ide/vault/{policies,config,scripts,secrets}
-
-# OpenShift structure
-mkdir -p ansible-dev-ide/openshift/{operators,applications,pipelines,manifests}
-
-# Documentation structure
-mkdir -p ansible-dev-ide/docs/{architecture,runbooks,demos,api}
-
-# Testing structure
-mkdir -p ansible-dev-ide/tests/{molecule,terraform,integration,unit}
-
-# CI/CD structure
-mkdir -p ansible-dev-ide/.github/{workflows,templates}
+# Install Python dependencies
+pip install -r requirements.txt
 ```
 
-### Initial Configuration Files
-
+**Install Ansible collections:**
 ```bash
-# Navigate to project root
-cd ansible-dev-ide
-
-# Create Ansible configuration
-cat > ansible/ansible.cfg << 'EOF'
-[defaults]
-inventory = inventories/
-host_key_checking = False
-retry_files_enabled = False
-stdout_callback = yaml
-callback_whitelist = timer, profile_tasks
-gather_facts = smart
-fact_caching = jsonfile
-fact_caching_connection = /tmp/facts_cache
-fact_caching_timeout = 3600
-pipelining = True
-forks = 20
-
-[ssh_connection]
-ssh_args = -o ControlMaster=auto -o ControlPersist=60s -o UserKnownHostsFile=/dev/null -o IdentitiesOnly=yes
-control_path_dir = /tmp/.ansible-%%C
-control_path = %(control_path_dir)s/%%h-%%r
-EOF
-
-# Create Terraform configuration
-cat > terraform/.terraformrc << 'EOF'
-provider_installation {
-  filesystem_mirror {
-    path    = "/tmp/terraform/providers"
-    include = ["registry.terraform.io/*/*"]
-  }
-  direct {
-    exclude = ["registry.terraform.io/*/*"]
-  }
-}
-EOF
-
-# Create pre-commit configuration
-cat > .pre-commit-config.yaml << 'EOF'
-repos:
-  - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0
-    hooks:
-      - id: trailing-whitespace
-      - id: end-of-file-fixer
-      - id: check-yaml
-      - id: check-json
-      - id: check-merge-conflict
-      
-  - repo: https://github.com/ansible/ansible-lint
-    rev: v6.22.1
-    hooks:
-      - id: ansible-lint
-        
-  - repo: https://github.com/antonbabenko/pre-commit-terraform
-    rev: v1.83.5
-    hooks:
-      - id: terraform_fmt
-      - id: terraform_validate
-      - id: terraform_tflint
-      
-  - repo: https://github.com/koalaman/shellcheck-precommit
-    rev: v0.9.0
-    hooks:
-      - id: shellcheck
-EOF
-```
-
-## Phase 4: Environment Configuration
-
-### AWS Configuration
-
-```bash
-# Configure AWS CLI
-aws configure
-# Enter your AWS Access Key ID, Secret Access Key, Default region, and Output format
-
-# Verify AWS configuration
-aws sts get-caller-identity
-aws ec2 describe-regions --output table
-```
-
-### Red Hat Authentication
-
-```bash
-# Login to Red Hat Container Registry
-podman login registry.redhat.io
-# Use your Red Hat Developer credentials
-
-# Login to Ansible Galaxy
+# Install required Ansible collections
 ansible-galaxy collection install -r requirements.yml
 ```
 
-### Git Configuration
-
+**Configure pre-commit hooks:**
 ```bash
-# Initialize Git repository
-git init
-git add .
-git commit -m "Initial project structure"
-
 # Install pre-commit hooks
 pre-commit install
+
+# Test hooks (optional)
+pre-commit run --all-files
 ```
 
-### Validation Scripts
+#### Step 9: Validate Environment
 
-Create validation scripts to verify the setup:
-
+**Run validation script:**
 ```bash
-# Create validation script
-cat > scripts/validate-setup.sh << 'EOF'
-#!/bin/bash
-
-echo "=== Validating Development Environment Setup ==="
-
-# Check CLI tools
-echo "Checking CLI tools..."
-terraform version
-ansible --version
-vault version
-aws --version
-oc version --client
-kubectl version --client
-helm version
-
-# Check Ansible collections
-echo "Checking Ansible collections..."
-ansible-galaxy collection list
-
-# Check Jinja2 and templating tools
-echo "Checking Jinja2..."
-python3 -c "import jinja2; print(f'Jinja2 version: {jinja2.__version__}')"
-j2 --version 2>/dev/null || echo "j2cli not found"
-
-# Check Terraform providers
-echo "Checking Terraform..."
-cd terraform/environments/dev
-terraform init -backend=false
-terraform providers
-
-# Check container tools
-echo "Checking container tools..."
-podman version
-docker --version 2>/dev/null || echo "Docker not installed (using Podman)"
-
-echo "=== Setup validation complete ==="
-EOF
-
-chmod +x scripts/validate-setup.sh
+# Make validation script executable and run it
+chmod +x scripts/validate-environment.sh
+./scripts/validate-environment.sh
 ```
 
-## Phase 5: Final Configuration
-
-**This section applies to both AI-assisted and manual setup paths.**
-
-### Configure MCP Server API Keys
-
-Edit `.cursor/mcp.json` and add your API keys:
-
-```json
-{
-  "mcpServers": {
-    "taskmaster-ai": {
-      "env": {
-        "ANTHROPIC_API_KEY": "your-claude-api-key-here"
-      }
-    },
-    "github": {
-      "env": {
-        "GITHUB_PERSONAL_ACCESS_TOKEN": "your-github-token-here"  
-      }
-    }
-  }
-}
-```
-
-### Validate Your Environment
-
-```bash
-# Run the validation script (created by setup)
-./validate-environment.sh
-
-# Should show all tools installed and repositories present
-```
-
-### Start Developing
-
-```bash
-# Quick start for Red Hat demo development
-./start-demo-development.sh
-
-# Or manually navigate
-cd product-demos
-cursor .
-```
+This will check:
+- All required tools are installed
+- API keys are configured
+- Git repositories are properly set up
+- Cursor IDE configuration is correct
 
 ---
 
-## Phase 6: Red Hat Product Demos Integration (Manual Setup Only)
+## 🔧 Final Configuration
 
-**Note: If you used AI-assisted setup, this is already configured.**
+**Both setup paths lead here. Complete these final steps:**
 
-### Setting Up the Red Hat Demos Repository
+### 1. **Add Your API Keys** 
 
-```bash
-# Create a workspace directory for Red Hat demo development
-mkdir -p ~/redhat-demo-workspace
-cd ~/redhat-demo-workspace
+Edit `.cursor/mcp.json` and replace all `YOUR_*_HERE` placeholders with actual values from the prerequisites checklist.
 
-# Clone the official Red Hat product demos repository
-git clone https://github.com/ansible/product-demos.git product-demos
-cd product-demos
+### 2. **Configure Cursor AI Model**
 
-# Fork the repository on GitHub if you plan to contribute
-# Then add your fork as a remote
-git remote add fork https://github.com/YOUR-USERNAME/product-demos.git
+In Cursor IDE:
+1. Open **Settings** (⌘ + ,)
+2. Search for **"AI Model"**
+3. Select **Claude 3.5 Sonnet** (recommended)
+4. Enter your **Anthropic API key**
 
-# Setup the enhanced development environment
-ln -s ../ansible-dev-ide/.cursor .cursor
-ln -s ../ansible-dev-ide/.pre-commit-config.yaml .pre-commit-config.yaml
-ln -s ../ansible-dev-ide/scripts/enhanced scripts/enhanced
-
-# Install pre-commit hooks for quality assurance
-pre-commit install
-
-# Verify the setup follows Red Hat demo standards
-./scripts/enhanced/validate-rh-demo-env.sh
-```
-
-### Understanding the Red Hat Demos Structure
-
-The [rh-product-demos repository](https://github.com/ansible/product-demos) follows this structure:
-- `linux/` - RHEL and Linux automation demos
-- `windows/` - Windows Server automation demos  
-- `cloud/` - Infrastructure and cloud provisioning
-- `network/` - Network automation demos
-- `openshift/` - OpenShift automation demos
-- `satellite/` - Red Hat Satellite Server demos
-
-### Creating a Custom Demo with AI Assistance
+### 3. **Test the Environment**
 
 ```bash
-# Navigate to the appropriate demo category
-cd product-demos/linux  # or windows/, cloud/, etc.
+# Run the validation script
+./scripts/validate-environment.sh
 
-# Create a new demo using AI assistance
-mkdir my-custom-demo
-cd my-custom-demo
-
-# Use Cursor IDE with Claude for intelligent development
-cursor .
-
-# Follow the established patterns from existing demos
-# - Copy structure from similar demos
-# - Use AI to generate playbooks following Red Hat best practices
-# - Leverage existing roles and collections
+# Start development environment
+./scripts/start-demo-development.sh
 ```
 
-### Integration with Automation Hub
+### 4. **Verify MCP Servers**
 
-```bash
-# Ensure your demos use official Red Hat collections
-# Add to collections/requirements.yml:
-cat >> collections/requirements.yml << 'EOF'
-collections:
-  - name: redhat.satellite
-    version: ">=3.0.0"
-  - name: redhat.insights
-    version: ">=1.0.0"
-  - name: ansible.posix
-    version: ">=1.3.0"
-EOF
+In Cursor IDE:
+1. Open **Command Palette** (⌘ + Shift + P)
+2. Type **"MCP"** 
+3. Verify you see 10 MCP servers connected
+4. Test AI integration with a simple prompt
 
-# Install collections using your Automation Hub credential
-ansible-galaxy collection install -r collections/requirements.yml
-```
+## 🎯 You're Ready!
 
-## Phase 6: TaskMaster Integration for Demo Management
+Your AI-enhanced Red Hat demo development environment is now configured with:
 
-### TaskMaster Integration
+- ✅ **Complete toolchain** (Terraform, Ansible, AWS CLI, Kubernetes, etc.)
+- ✅ **AI integration** (Cursor + Claude + 10 MCP servers)
+- ✅ **Development workflow** (pre-commit hooks, linting, formatting)
+- ✅ **Red Hat demo repositories** (forked and properly configured)
 
-```bash
-# Initialize TaskMaster for project management
-npx task-master-ai init --name="Red Hat Demo Environment" \
-  --description="Comprehensive Red Hat ecosystem demo with AAP, Terraform, and OpenShift" \
-  --version="0.1.0" \
-  --yes
+**Next Steps:**
+1. **Explore the demos**: `cd product-demos && ls`
+2. **Start with Ansible**: Try the Ansible Automation Platform demos
+3. **AI Assistance**: Use Claude in Cursor for code generation and troubleshooting
+4. **Customize**: Adapt the environment for your specific use cases
 
-# Create initial PRD
-cp .taskmaster/templates/example_prd.txt .taskmaster/docs/prd.txt
-# Edit the PRD to match your project requirements
+## 🆘 Troubleshooting
 
-# Parse PRD to generate initial tasks
-npx task-master-ai parse-prd .taskmaster/docs/prd.txt --num-tasks=15 --research
-```
+**Common Issues:**
 
-### Documentation Setup
+- **"GitHub clone failed"**: Check your GitHub username and SSH key configuration
+- **"MCP servers not connecting"**: Verify API keys in `.cursor/mcp.json`
+- **"Tool not found"**: Re-run the installation steps for missing tools
+- **"Permission denied"**: Check file permissions and run with proper user privileges
 
-```bash
-# Create comprehensive README
-cat > README.md << 'EOF'
-# Red Hat Demo Environment
+**Getting Help:**
+- Check [docs/TROUBLESHOOTING.md](./docs/TROUBLESHOOTING.md)
+- Review logs in `~/.cursor/logs/`
+- Open an issue in the [GitHub repository](https://github.com/sibilleb/RedHat-Demo-AI-IDE/issues)
 
-A comprehensive demonstration environment showcasing modern Red Hat ecosystem technologies including Ansible Automation Platform, Terraform, HashiCorp Vault, OpenShift, and Event Driven Ansible on AWS.
+## Security Considerations
 
-## Quick Start
+**Secrets Management:**
+- Never commit API keys or credentials to git
+- Use `.env` files or MCP configuration for sensitive data
+- The `.cursor/mcp.json` file is gitignored for security
+- Use HashiCorp Vault for production secrets
 
-1. Follow the [Setup Guide](SETUP_GUIDE.md) to configure your development environment
-2. Review the [Architecture Documentation](docs/architecture/README.md)
-3. Execute the validation scripts: `./scripts/validate-setup.sh`
-4. Start with the demos in the [demos](docs/demos/) directory
+**Container Security:**
+- Images are scanned for vulnerabilities via pre-commit hooks
+- Run containers as non-root when possible
+- Use Red Hat Universal Base Images (UBI) for production
 
-## Technology Stack
-
-- **Infrastructure**: Terraform, AWS
-- **Automation**: Ansible Automation Platform, Event Driven Ansible
-- **Templating**: Jinja2 (for dynamic configuration and playbooks)
-- **Security**: HashiCorp Vault, Red Hat Advanced Cluster Security
-- **Containers**: OpenShift, Podman
-- **CI/CD**: GitHub Actions, Tekton Pipelines
-- **Monitoring**: Prometheus, Grafana
-
-## Project Management
-
-This project uses TaskMaster AI for project management. View tasks with:
-```bash
-npx task-master-ai list
-npx task-master-ai next
-```
-
-## Contributing
-
-Please read our [Contributing Guidelines](CONTRIBUTING.md) before submitting pull requests.
-EOF
-```
-
-## Verification and Testing
-
-### Run Validation
-
-```bash
-# Execute the validation script
-./scripts/validate-setup.sh
-
-# Test Ansible connectivity
-ansible localhost -m ping
-
-# Test Terraform initialization
-cd terraform/environments/dev && terraform init && cd -
-
-# Test container operations
-podman run --rm hello-world
-
-# Test Jinja2 templating
-echo "Testing Jinja2 templating..."
-echo "Hello {{ name }}!" | j2 --name="Red Hat Demo" || echo "Using Python fallback"
-python3 -c "from jinja2 import Template; print(Template('Hello {{ name }}!').render(name='Red Hat Demo'))"
-```
-
-### Environment Health Check
-
-```bash
-# Create health check script
-cat > scripts/health-check.sh << 'EOF'
-#!/bin/bash
-
-echo "=== Environment Health Check ==="
-
-# Check disk space
-echo "Disk space:"
-df -h
-
-# Check memory
-echo "Memory usage:"
-free -h 2>/dev/null || vm_stat
-
-# Check running services
-echo "Container services:"
-podman ps -a
-
-# Check network connectivity
-echo "Network connectivity:"
-ping -c 3 google.com
-aws sts get-caller-identity
-
-echo "=== Health check complete ==="
-EOF
-
-chmod +x scripts/health-check.sh
-./scripts/health-check.sh
-```
-
-## Next Steps
-
-After completing this setup:
-
-1. **Setup Red Hat Demo Integration**: Run `./scripts/setup-rh-demo-integration.sh` to integrate with the official Red Hat product demos
-2. **Start Demo Development**: Navigate to `~/redhat-demo-workspace/product-demos` and open in Cursor IDE
-3. **Explore Existing Demos**: Review demos in `linux/`, `windows/`, `cloud/`, `network/`, `openshift/`, and `satellite/` directories
-4. **Create Your First AI-Assisted Demo**: Follow the AI-assisted workflow documentation
-5. **Contribute Back**: Use the enhanced environment to create pull requests to the main Red Hat demos repository
-
-### Red Hat Demo Development Workflow
-
-```bash
-# Quick start after setup
-cd ~/redhat-demo-workspace/product-demos
-cursor .
-
-# Create a new demo with AI assistance
-cd linux  # or appropriate category
-mkdir my-custom-demo
-cd my-custom-demo
-cursor .
-# Use Claude to generate demo content following Red Hat patterns
-
-# Contribute back to the community
-git checkout -b feature/my-custom-demo
-git add .
-git commit -m "Add enhanced demo with AI assistance"
-git push fork feature/my-custom-demo
-# Create PR via GitHub
-```
-
-## Troubleshooting
-
-### Common Issues
-
-**Terraform Provider Issues**:
-```bash
-terraform providers lock -platform=darwin_amd64 -platform=linux_amd64
-```
-
-**Ansible Collection Issues**:
-```bash
-ansible-galaxy collection install --force -r requirements.yml
-```
-
-**Container Permission Issues**:
-```bash
-# For Podman on macOS
-podman machine stop
-podman machine start
-```
-
-**AWS CLI Issues**:
-```bash
-aws configure list
-aws sts get-caller-identity
-```
-
-### Getting Help
-
-- Red Hat Customer Portal: https://access.redhat.com
-- Ansible Documentation: https://docs.ansible.com
-- Terraform Documentation: https://developer.hashicorp.com/terraform
-- OpenShift Documentation: https://docs.openshift.com
+**Access Control:**
+- Use separate accounts for development and production
+- Follow principle of least privilege
+- Enable MFA on all cloud accounts
 
 ## License
 
@@ -811,45 +493,63 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Acknowledgments
 
-- Red Hat Community for excellent documentation and tools
-- HashiCorp for robust infrastructure tools
-- The open-source community for continuous innovation
+- **Red Hat Community** for excellent documentation and tools
+- **HashiCorp** for robust infrastructure tools
+- **Ansible Community** for automation excellence
+- **Open Source Community** for continuous innovation
 
 ---
 
 ## Summary
 
-This setup guide provides an AI-enhanced development environment for working with the [Red Hat Product Demos repository](https://github.com/ansible/product-demos). The key value proposition is:
+This setup guide provides two paths to create an AI-enhanced development environment for Red Hat demo development:
+
+### One-Click Setup Benefits
+- **5-minute setup** from zero to productive development
+- **Consistent environment** across all team members
+- **Best practices** automatically configured
+- **Production-ready** configuration
+
+### Manual Setup Benefits
+- **Complete understanding** of all components
+- **Customization opportunities** for specific needs
+- **Learning experience** for the technology stack
+- **Troubleshooting knowledge** for complex environments
+
+### Key Value Propositions
 
 **Traditional Red Hat Demo Development:**
 - Manual coding and testing
 - Standard IDE experience
 - Manual best practices enforcement
+- Individual knowledge silos
 
 **AI-Enhanced Development with This Environment:**
 - Cursor IDE + Claude for intelligent code generation
 - Automated Red Hat standards compliance
 - Real-time validation and suggestions
-- Seamless integration with existing Red Hat workflows
+- Shared AI knowledge across team
+- Seamless integration with existing workflows
 
-### Key Benefits for Red Hat Teams
+### For Red Hat Teams
 
-1. **Faster Demo Creation**: AI assistance accelerates development
-2. **Higher Quality**: Automated validation ensures Red Hat standards
-3. **Better Consistency**: AI learns from existing demo patterns
-4. **Easier Contributions**: Streamlined workflow for contributing back
-5. **Knowledge Transfer**: Modern development practices for the entire team
+1. **Faster Demo Creation**: AI assistance accelerates development by 3-5x
+2. **Higher Quality**: Automated validation ensures Red Hat standards compliance
+3. **Better Consistency**: AI learns from existing demo patterns and enforces them
+4. **Easier Contributions**: Streamlined workflow for contributing back to official repos
+5. **Knowledge Transfer**: Modern development practices shared across entire team
+6. **Reduced Onboarding**: New team members productive in hours instead of days
 
 ### Integration Points
 
-- **Direct integration** with [rh-product-demos](https://github.com/ansible/product-demos)
+- **Direct integration** with [ansible/product-demos](https://github.com/ansible/product-demos)
 - **Compatible** with [demo.redhat.com](https://demo.redhat.com) environments
-- **Supports** existing Red Hat collection and automation hub workflows
-- **Enhances** current contribution processes
+- **Supports** existing Red Hat collections and Automation Hub workflows
+- **Enhances** current contribution processes without disrupting them
 
 ---
 
-**Setup completed on**: $(date)
-**Environment version**: 2.0.0 (AI-Enhanced)
-**Maintained by**: Red Hat Solutions Architecture Team  
-**Integration with**: [Red Hat Product Demos](https://github.com/ansible/product-demos) 
+**Environment Version**: 2.0.0 (AI-Enhanced)  
+**Compatible with**: Red Hat Product Demos Repository  
+**Maintained by**: Red Hat Solutions Architecture Community  
+**Setup completed**: $(date) 

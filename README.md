@@ -4,32 +4,29 @@
 
 This repository provides an AI-assisted development environment for creating and enhancing [Red Hat Product Demos](https://github.com/ansible/product-demos) using modern tools like Cursor IDE, Claude AI, Ansible Automation Platform, Terraform, OpenShift, and Event Driven Ansible.
 
+## ⚠️ **CRITICAL: Read Before Starting**
+
+### 🔑 **MANDATORY Prerequisites Checklist**
+
+**The setup WILL FAIL without these credentials. Prepare them first:**
+
+| **Status** | **Required Item** | **Where to Get** | **Purpose** |
+|------------|------------------|------------------|-------------|
+| ✅ **MANDATORY** | GitHub Username | Your GitHub account | Repository forking/cloning |
+| ✅ **MANDATORY** | GitHub Personal Access Token | [GitHub Settings → Tokens](https://github.com/settings/tokens) | MCP GitHub integration |
+| ✅ **MANDATORY** | AWS Access Key + Secret | [AWS Console → IAM](https://console.aws.amazon.com/iam/) | All AWS MCP servers |
+| ⚠️ **Recommended** | Anthropic API Key | [Anthropic Console](https://console.anthropic.com/) | Claude AI in Cursor |
+
+### 💻 **System Requirements**
+- **OS**: macOS, Linux, or Windows WSL2
+- **RAM**: 16GB minimum (32GB recommended) 
+- **Storage**: 50GB available space
+
+📖 **[→ Complete Prerequisites Guide](SETUP_GUIDE.md#⚠️-important-complete-prerequisites-checklist)**
+
+---
+
 ## 🚀 Quick Start Guide
-
-### Prerequisites & Preparation (Do This First!)
-
-Before starting, ensure you have:
-
-#### Required Accounts & Access
-- **GitHub Account** (free) - for forking repositories
-- **Cursor IDE** - download from [cursor.sh](https://cursor.sh) (free)
-- **Terminal/Shell access** - Command line on your system
-
-#### API Keys You'll Need (Prepare These)
-**Required:**
-- **Anthropic API Key** - for Claude AI assistance ([get one here](https://console.anthropic.com))
-
-**Optional but Recommended:**
-- **GitHub Personal Access Token** - for enhanced GitHub integration
-- **Perplexity API Key** - for research-enhanced task generation
-- **OpenAI API Key** - if you prefer GPT models
-- **AWS Account** - if working with cloud infrastructure demos
-
-#### System Requirements
-- **OS**: macOS, Linux, or Windows with WSL2
-- **RAM**: 16GB minimum (32GB recommended)
-- **Storage**: 10GB free space
-- **Internet**: Stable connection for downloads
 
 ---
 
@@ -105,7 +102,8 @@ Now I need to complete the full development environment setup. Please reference 
 
 2. Configure Cursor IDE integration:
    - Set up the .cursor configuration symlink
-   - Copy and configure the MCP server template
+   - Copy and configure the comprehensive MCP server template (10 servers)
+  - See [MCP_SERVERS.md](./docs/MCP_SERVERS.md) for detailed server information
    - Install recommended Cursor extensions
 
 3. Set up development workflow tools:
@@ -198,7 +196,7 @@ If you prefer manual setup without AI assistance:
 - **Containers**: OpenShift + Podman
 - **Security**: HashiCorp Vault + Red Hat Advanced Cluster Security
 - **Templating**: Jinja2 for dynamic configurations
-- **AI Tools**: Cursor IDE + Claude + MCP Servers
+- **AI Tools**: Cursor IDE + Claude + 10 Essential MCP Servers (Ansible, AWS, Terraform, K8s, etc.)
 
 ## 🏗️ How It Works
 
@@ -304,6 +302,7 @@ git push origin feature/my-awesome-demo
 ## 📚 Documentation
 
 - **[Complete Setup Guide](SETUP_GUIDE.md)** - Detailed manual setup instructions
+- **[MCP Servers Guide](docs/MCP_SERVERS.md)** - Comprehensive 11-server MCP configuration
 - **[Development Workflow](docs/DEVELOPMENT_WORKFLOW.md)** - AI-assisted development patterns
 - **[Contributing Guidelines](CONTRIBUTING.md)** - How to contribute to Red Hat demos
 - **[Troubleshooting](docs/TROUBLESHOOTING.md)** - Common issues and solutions

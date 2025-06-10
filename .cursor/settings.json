@@ -1,0 +1,396 @@
+{
+  "// Cursor AI Settings": "",
+  "cursor.cpp.enableClangd": false,
+  "cursor.aiEnabled": true,
+  "cursor.chat.enabled": true,
+  "cursor.prediction.enabled": true,
+  "cursor.aiModelSelection": "claude-3.5-sonnet",
+  "cursor.commandExecution.enabled": true,
+  "cursor.commandExecution.confirmBeforeExecution": true,
+  
+  "// Editor Settings": "",
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": true,
+  "editor.insertSpaces": true,
+  "editor.tabSize": 2,
+  "editor.rulers": [80, 120],
+  "editor.wordWrap": "on",
+  "editor.minimap.enabled": true,
+  "editor.bracketPairColorization.enabled": true,
+  "editor.guides.bracketPairs": true,
+  "editor.inlineSuggest.enabled": true,
+  "editor.quickSuggestions": {
+    "other": true,
+    "comments": false,
+    "strings": true
+  },
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": true,
+    "source.fixAll": true,
+    "source.fixAll.eslint": true,
+    "source.fixAll.shellcheck": true
+  },
+  
+  // Default formatters to prevent conflicts
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  
+  "// File Settings": "",
+  "files.autoSave": "afterDelay",
+  "files.autoSaveDelay": 1000,
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "files.trimFinalNewlines": true,
+  "files.associations": {
+    "*.yml": "yaml",
+    "*.yaml": "yaml",
+    "*.j2": "jinja",
+    "*.jinja": "jinja",
+    "Vagrantfile": "ruby",
+    "Dockerfile.*": "dockerfile",
+    "*.tf": "terraform",
+    "*.tfvars": "terraform",
+    "*.hcl": "hcl",
+    "*.pkr.hcl": "hcl",
+    "*.nomad": "hcl",
+    "*.sentinel": "hcl",
+    "ansible.cfg": "ini",
+    "*.hosts": "ini",
+    "inventory": "ini",
+    "*.inv": "ini"
+  },
+  "files.exclude": {
+    "**/.DS_Store": true,
+    "**/node_modules": true,
+    "**/.terraform": true,
+    "**/.ansible": true,
+    "**/venv": true,
+    "**/__pycache__": true,
+    "**/.pytest_cache": true,
+    "**/.mypy_cache": true
+  },
+  
+  "// Terminal Settings": "",
+  "terminal.integrated.defaultProfile.osx": "zsh",
+  "terminal.integrated.defaultProfile.linux": "bash",
+  "terminal.integrated.shell.osx": "/bin/zsh",
+  "terminal.integrated.copyOnSelection": true,
+  "terminal.integrated.rightClickBehavior": "paste",
+  
+  "// Language Specific Settings": "",
+  
+  // Shell Scripts
+  "[shellscript]": {
+    "editor.defaultFormatter": "foxundermoon.shell-format",
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true
+  },
+  
+  // YAML (Ansible, Kubernetes, etc.)
+  "[yaml]": {
+    "editor.defaultFormatter": "redhat.vscode-yaml",
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true,
+    "editor.autoIndent": "advanced"
+  },
+  "yaml.format.enable": true,
+  "yaml.format.singleQuote": false,
+  "yaml.format.bracketSpacing": true,
+  "yaml.validate": true,
+  "yaml.hover": true,
+  "yaml.completion": true,
+  "yaml.customTags": [
+    "!vault",
+    "!encrypted/pkcs1-oaep scalar",
+    "!reference sequence",
+    "!include scalar"
+  ],
+  "yaml.schemas": {
+    "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/ansible.json#/$defs/playbook": "playbooks/*.yml",
+    "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/ansible.json#/$defs/tasks": "tasks/*.yml",
+    "https://json.schemastore.org/github-workflow.json": ".github/workflows/*.yml",
+    "https://json.schemastore.org/kustomization.json": "kustomization.yaml",
+    "kubernetes": "k8s/*.yaml"
+  },
+  
+  // JSON
+  "[json]": {
+    "editor.defaultFormatter": "vscode.json-language-features",
+    "editor.tabSize": 2
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "vscode.json-language-features",
+    "editor.tabSize": 2
+  },
+  
+  // TOML
+  "[toml]": {
+    "editor.defaultFormatter": "tamasfe.even-better-toml",
+    "editor.tabSize": 2
+  },
+  
+  // Ansible specific
+  "ansible.validation.enabled": true,
+  "ansible.validation.lint.enabled": true,
+  "ansible.python.interpreterPath": "/usr/bin/python3",
+  "ansible.ansibleLint.enabled": true,
+  "ansible.executionEnvironment.enabled": false,
+  "ansible.completion.provideRedirectModules": true,
+  "ansible.completion.provideModuleOptionAliases": true,
+  
+  // Terraform specific
+  "[terraform]": {
+    "editor.defaultFormatter": "hashicorp.terraform",
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true
+  },
+  "[terraform-vars]": {
+    "editor.defaultFormatter": "hashicorp.terraform",
+    "editor.tabSize": 2
+  },
+  "[hcl]": {
+    "editor.defaultFormatter": "hashicorp.hcl",
+    "editor.tabSize": 2
+  },
+  "terraform.experimentalFeatures.validateOnSave": true,
+  "terraform.validation.enableEnhancedValidation": true,
+  "terraform.languageServer.enable": true,
+  "terraform.format.enable": true,
+  "terraform.codelens.referenceCount": true,
+  
+  // Python specific
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter",
+    "editor.tabSize": 4,
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": true
+    }
+  },
+  "python.defaultInterpreterPath": "/usr/bin/python3",
+  "python.linting.enabled": true,
+  "python.linting.pylintEnabled": true,
+  "python.linting.flake8Enabled": true,
+  "python.formatting.provider": "none",
+  "python.sortImports.args": ["--profile", "black"],
+  "isort.args": ["--profile", "black"],
+  "black-formatter.args": ["--line-length=88"],
+  "flake8.args": ["--max-line-length=88", "--extend-ignore=E203,W503"],
+  
+  // JavaScript/TypeScript
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.tabSize": 2
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.tabSize": 2
+  },
+  
+  // Markdown
+  "[markdown]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.wordWrap": "on",
+    "editor.quickSuggestions": {
+      "comments": "off",
+      "strings": "off",
+      "other": "off"
+    }
+  },
+  
+  // Docker
+  "[dockerfile]": {
+    "editor.defaultFormatter": "ms-azuretools.vscode-docker",
+    "editor.tabSize": 4
+  },
+  "docker.enableDockerComposeLanguageService": true,
+  "docker.languageserver.formatter.ignoreMultilineInstructions": true,
+  
+  // XML
+  "[xml]": {
+    "editor.defaultFormatter": "redhat.vscode-xml",
+    "editor.tabSize": 2
+  },
+  
+  // Properties/INI files
+  "[properties]": {
+    "editor.defaultFormatter": "foxundermoon.shell-format",
+    "editor.tabSize": 4
+  },
+  "[ini]": {
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true
+  },
+  
+  // SQL
+  "[sql]": {
+    "editor.defaultFormatter": "ms-mssql.mssql",
+    "editor.tabSize": 2
+  },
+  
+  // Prettier configuration
+  "prettier.tabWidth": 2,
+  "prettier.useTabs": false,
+  "prettier.semi": true,
+  "prettier.singleQuote": true,
+  "prettier.trailingComma": "es5",
+  "prettier.printWidth": 80,
+  "prettier.bracketSpacing": true,
+  "prettier.arrowParens": "avoid",
+  
+  // Shell formatter configuration
+  "shellformat.effectLanguages": [
+    "shellscript",
+    "dockerfile",
+    "dotenv",
+    "hosts",
+    "jvmoptions",
+    "ignore",
+    "gitignore",
+    "spring-boot-properties",
+    "azcli",
+    "bats"
+  ],
+  "shellformat.useEditorConfig": true,
+  "shellformat.binaryNextLine": true,
+  "shellformat.keepComments": true,
+  "shellformat.stopOnError": true,
+  
+  // ShellCheck configuration
+  "shellcheck.enableQuickFix": true,
+  "shellcheck.run": "onSave",
+  "shellcheck.executablePath": "shellcheck",
+  "shellcheck.exclude": ["SC1091"],
+  "shellcheck.ignorePatterns": {
+    "**/*.zsh": true,
+    "**/*.zsh*": true,
+    "**/zsh/**": true
+  },
+  
+  // Git settings
+  "git.enableSmartCommit": true,
+  "git.confirmSync": false,
+  "git.autofetch": true,
+  "git.autorefresh": true,
+  "gitlens.mode.active": "zen",
+  "gitlens.currentLine.enabled": true,
+  "gitlens.hovers.currentLine.over": "line",
+  
+  // EditorConfig
+  "editorconfig.generateAuto": true,
+  
+  // Auto-sorting and organizing
+  "sortLines.filterBlankLines": true,
+  "yaml-sort.locale": "en",
+  "yaml-sort.quotingType": "\"",
+  "yaml-sort.lineWidth": 80,
+  
+  // Search settings
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/bower_components": true,
+    "**/.terraform": true,
+    "**/venv": true,
+    "**/__pycache__": true,
+    "**/.git": true,
+    "**/.mypy_cache": true,
+    "**/.pytest_cache": true,
+    "**/coverage": true
+  },
+  
+  // Security and validation
+  "redhat.telemetry.enabled": false,
+  "security.workspace.trust.untrustedFiles": "open",
+  
+  // Error Lens configuration
+  "errorLens.enabledDiagnosticLevels": [
+    "error",
+    "warning",
+    "info"
+  ],
+  "errorLens.excludeBySource": [
+    "cSpell",
+    "Grammarly"
+  ],
+  
+  // Spell checking
+  "cSpell.words": [
+    "ansible",
+    "terraform",
+    "kubernetes",
+    "openshift",
+    "podman",
+    "jinja",
+    "boto",
+    "awscli",
+    "kubectl",
+    "yaml",
+    "yml",
+    "tfvars",
+    "playbook",
+    "playbooks",
+    "vars",
+    "handlers",
+    "tasks",
+    "roles",
+    "inventories",
+    "venv",
+    "pyenv",
+    "hashicorp",
+    "vault",
+    "nomad",
+    "consul",
+    "packer",
+    "waypoint",
+    "redhat",
+    "rhel",
+    "centos",
+    "fedora",
+    "ubuntu",
+    "debian",
+    "dockerfiles",
+    "containerfile",
+    "buildah",
+    "skopeo",
+    "crio",
+    "systemd",
+    "selinux",
+    "firewalld",
+    "cockpit"
+  ],
+  
+  // Extension specific settings
+  "extensions.autoUpdate": true,
+  "extensions.ignoreRecommendations": false,
+  
+  // Linting and validation settings
+  "todo-tree.general.tags": [
+    "BUG",
+    "HACK",
+    "FIXME",
+    "TODO",
+    "XXX",
+    "[ ]",
+    "[x]",
+    "SECURITY",
+    "PERFORMANCE"
+  ],
+  "todo-tree.regex.regex": "(//|#|<!--|;|/\\*|^|^\\s*(-|\\d+.))\\s*($TAGS)",
+  
+  // Performance settings
+  "files.watcherExclude": {
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/node_modules/*/**": true,
+    "**/.terraform/**": true,
+    "**/venv/**": true,
+    "**/.mypy_cache/**": true,
+    "**/__pycache__/**": true
+  },
+  
+  // Disable conflicting extensions
+  "html.format.enable": false,
+  "css.format.enable": false,
+  "javascript.format.enable": false,
+  "typescript.format.enable": false,
+  "json.format.enable": false
+} 
